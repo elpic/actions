@@ -37,30 +37,42 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Capture SSR-rendered HTML
+      - name: Generate index.html
         run: |
-          # Start the built Worker locally via the dist/server/wrangler.json
-          # (already configured with main: index.js and assets.directory: ../client).
-          # Run from project root so node_modules are resolvable.
-          npx wrangler dev \
-            --config dist/server/wrangler.json \
-            --port 8788 --ip localhost --inspector-port 0 &
-          WRANGLER_PID=$!
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
 
-          # Wait for the server to be ready
-          for i in $(seq 1 30); do
-            if curl -s -o /dev/null http://localhost:8788 2>/dev/null; then
-              break
-            fi
-            sleep 1
-          done
+          const assets = fs.readdirSync('dist/client/assets');
 
-          # Capture the real SSR-rendered HTML
-          curl -s http://localhost:8788 > dist/client/index.html
-          kill $WRANGLER_PID 2>/dev/null || true
-          wait $WRANGLER_PID 2>/dev/null || true
+          // Pick the first CSS and sort JS files by size (smallest = entry point)
+          const css = assets.find(f => f.endsWith('.css'));
+          const js = assets
+            .filter(f => f.startsWith('index-') && f.endsWith('.js'))
+            .sort((a, b) => fs.statSync('dist/client/assets/' + a).size
+                           - fs.statSync('dist/client/assets/' + b).size)[0];
 
-          echo "Captured dist/client/index.html ($(wc -c < dist/client/index.html) bytes)"
+          if (!js) { console.error('no index-*.js found'); process.exit(1); }
+
+          const h = [
+            '<!DOCTYPE html>',
+            '<html lang=\"en\">',
+            '<head>',
+            '  <meta charset=\"utf-8\" />',
+            '  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />',
+            css ? '  <link rel=\"stylesheet\" href=\"/assets/' + css + '\" />' : '',
+            '</head>',
+            '<body>',
+            '  <div id=\"root\"></div>',
+            '  <script type=\"module\" src=\"/assets/' + js + '\"></script>',
+            '</body>',
+            '</html>',
+          ].filter(Boolean).join('\n');
+
+          fs.writeFileSync('dist/client/index.html', h);
+          const size = fs.statSync('dist/client/index.html').size;
+          console.log('Generated dist/client/index.html (' + size + ' bytes, JS=' + js + (css ? ', CSS=' + css : '') + ')');
+          "
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
