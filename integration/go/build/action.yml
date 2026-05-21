@@ -1,0 +1,23 @@
+name: Go Build
+description: Build the Go binary and upload it as an artifact
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  build-task:
+    description: mise task that builds the binary
+    required: false
+    default: build
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - shell: bash
+      run: mise run ${{ inputs.build-task }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-binaries
+        path: ${{ inputs.app-name }}-*

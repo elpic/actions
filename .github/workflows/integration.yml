@@ -1,8 +1,8 @@
-# CI for the actions repository itself.
+# Integration checks for the actions repository itself.
 # Validates that all action.yml files are syntactically correct
 # and that README.md files follow the expected template.
 
-name: CI
+name: Integration
 
 on:
   pull_request:
