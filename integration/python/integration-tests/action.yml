@@ -1,5 +1,5 @@
 name: Python Integration Tests
-description: Run integration tests via mise
+description: Run integration tests with configurable environment
 
 inputs:
   setup:
@@ -11,9 +11,16 @@ inputs:
     required: false
     default: "20"
   integration-task:
-    description: mise task for integration tests
+    description: Task for integration tests
     required: false
     default: test:integration
+  env:
+    description: >
+      Environment variables to pass to the test process, one KEY=VALUE per line.
+      Example:
+        DATABASE_URL=postgres://postgres:test@localhost:5432/test
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -29,6 +36,15 @@ runs:
       shell: bash
       run: |
         curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+    - name: Export environment variables
+      if: inputs.env != ''
+      shell: bash
+      run: |
+        echo "${{ inputs.env }}" | while IFS= read -r line; do
+          if [ -n "$line" ]; then
+            echo "$line" >> "$GITHUB_ENV"
+          fi
+        done
     - if: inputs.setup == 'mise'
       shell: bash
       run: mise run ${{ inputs.integration-task }}

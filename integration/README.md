@@ -71,6 +71,9 @@ jobs:
       - uses: elpic/actions/integration/go/integration-tests@v1
         with:
           app-name: myapp
+          env: |
+            DATABASE_URL=postgres://postgres:test@localhost:5432/test?sslmode=disable
+            REDIS_URL=redis://localhost:6379
 
   security:
     runs-on: *runner
@@ -114,6 +117,8 @@ jobs:
       - uses: elpic/actions/integration/go/integration-tests@v1
         with:
           app-name: myapp
+          env: |
+            DATABASE_URL=postgres://postgres:test@localhost:5432/test?sslmode=disable
   security:
     runs-on: ubuntu-latest
     steps:
@@ -145,6 +150,9 @@ jobs:
           - 5432:5432
     steps:
       - uses: elpic/actions/integration/python/integration-tests@v1
+        with:
+          env: |
+            DATABASE_URL=postgres://postgres:test@localhost:5432/test?sslmode=disable
   security:
     runs-on: ubuntu-latest
     steps:
@@ -184,6 +192,8 @@ jobs:
       - uses: elpic/actions/integration/node/integration-tests@v1
         with:
           app-name: myapp
+          env: |
+            DATABASE_URL=postgres://postgres:test@localhost:5432/test?sslmode=disable
   security:
     runs-on: ubuntu-latest
     steps:
@@ -211,4 +221,15 @@ Integration tests often need databases or caches. Use GitHub's [`services`](http
 | MySQL | `mysql:8` | 3306 |
 | LocalStack | `localstack/localstack` | 4566 |
 
-See each action's README for its expected environment variables.
+Each integration action supports an `env` input to pass connection strings:
+
+```yaml
+      - uses: elpic/actions/integration/go/integration-tests@v1
+        with:
+          app-name: myapp
+          env: |
+            DATABASE_URL=postgres://postgres:test@localhost:5432/test?sslmode=disable
+            REDIS_URL=redis://localhost:6379
+```
+
+Each line is exported as an environment variable before the test command runs.

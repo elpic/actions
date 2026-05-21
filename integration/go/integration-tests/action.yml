@@ -10,10 +10,20 @@ inputs:
     description: Node.js version (used when setup=node)
     required: false
     default: "20"
+  app-name:
+    description: Application name; used in artifact names
+    required: true
   integration-task:
-    description: mise task for integration tests
+    description: Task for integration tests
     required: false
     default: test:integration
+  env:
+    description: >
+      Environment variables to pass to the test process, one KEY=VALUE per line.
+      Example:
+        DATABASE_URL=postgres://postgres:test@localhost:5432/test
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -29,12 +39,23 @@ runs:
       shell: bash
       run: |
         curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
-    - if: inputs.setup == 'mise'
+    - uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-binaries
+    - name: Export environment variables
+      if: inputs.env != ''
       shell: bash
-      run: mise run ${{ inputs.integration-task }}
-    - if: inputs.setup == 'node'
-      shell: bash
-      run: npm run ${{ inputs.integration-task }}
-    - if: inputs.setup == 'just'
-      shell: bash
-      run: just ${{ inputs.integration-task }}
+      run: |
+        echo "${{ inputs.env }}" | while IFS= read -r line; do
+          if [ -n "$line" ]; then
+            echo "$line" >> "$GITHUB_ENV"
+          fi
+        done
+    - shell: bash
+      run: |
+        chmod +x ${{ inputs.app-name }}-*
+        case "${{ inputs.setup }}" in
+          mise) mise run ${{ inputs.integration-task }} ;;
+          node) npm run ${{ inputs.integration-task }} ;;
+          just) just ${{ inputs.integration-task }} ;;
+        esac
