@@ -72,7 +72,7 @@ const features = [
   {
     icon: Layers,
     title: "Composite by design",
-    body: "Each action ships a single action.yml — drop it into any job and it handles checkout and tooling internally.",
+    body: "Each action ships a single action.yml. Drop it into any job and it handles checkout and tooling internally.",
   },
   {
     icon: Tag,
@@ -130,7 +130,7 @@ function Landing() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              v1.0.0 — released today
+              v1.0.1 - released today
             </div>
             <h1 className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
               Reusable GitHub Actions,{" "}
@@ -286,7 +286,7 @@ function Landing() {
               </p>
               <ul className="mt-6 space-y-3 text-sm">
                 {[
-                  "Drop-in composite steps — no custom runners required",
+                  "Drop-in composite steps. No custom runners required",
                   "Consistent inputs across language ecosystems",
                   "Conventional-commits release flow via release-please",
                 ].map((line) => (
