@@ -38,11 +38,11 @@ jobs:
         run: bun run build
 
       - name: Generate index.html
+        shell: bash
         run: |
           CLIENT_DIR="dist/client"
           ASSETS_DIR="$CLIENT_DIR/assets"
 
-          # Find CSS and JS files (content-hashed filenames)
           CSS=$(ls "$ASSETS_DIR"/styles-*.css 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "")
           JS=$(ls "$ASSETS_DIR"/index-*.js 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "")
 
@@ -51,25 +51,27 @@ jobs:
             exit 1
           fi
 
-          cat > "$CLIENT_DIR/index.html" <<EOF
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <meta name="description" content="elpic/actions - Reusable GitHub Actions, integration and delivery composite workflow templates" />
-            <meta property="og:title" content="elpic/actions - Reusable GitHub Actions" />
-            <meta property="og:description" content="Composite GitHub Actions for integration, release, and delivery." />
-            <meta property="og:type" content="website" />
-            <title>elpic/actions - Reusable GitHub Actions</title>
-            $(if [ -n "$CSS" ]; then echo "<link rel=\"stylesheet\" href=\"/assets/$CSS\" />"; fi)
-          </head>
-          <body>
-            <div id="root"></div>
-            <script type="module" src="/assets/$JS"></script>
-          </body>
-          </html>
-EOF
+          {
+            echo '<!DOCTYPE html>'
+            echo '<html lang="en">'
+            echo '<head>'
+            echo '  <meta charset="utf-8" />'
+            echo '  <meta name="viewport" content="width=device-width, initial-scale=1" />'
+            echo '  <meta name="description" content="elpic/actions - Reusable GitHub Actions, integration and delivery composite workflow templates" />'
+            echo '  <meta property="og:title" content="elpic/actions - Reusable GitHub Actions" />'
+            echo '  <meta property="og:description" content="Composite GitHub Actions for integration, release, and delivery." />'
+            echo '  <meta property="og:type" content="website" />'
+            echo '  <title>elpic/actions - Reusable GitHub Actions</title>'
+            if [ -n "$CSS" ]; then
+              echo "  <link rel=\"stylesheet\" href=\"/assets/$CSS\" />"
+            fi
+            echo '</head>'
+            echo '<body>'
+            echo '  <div id="root"></div>'
+            echo "  <script type=\"module\" src=\"/assets/$JS\"></script>"
+            echo '</body>'
+            echo '</html>'
+          } > "$CLIENT_DIR/index.html"
 
           echo "Generated $CLIENT_DIR/index.html"
           ls -la "$CLIENT_DIR/index.html"
