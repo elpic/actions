@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/elpic/actions/compare/v1.0.0...v1.1.0) (2026-05-21)
+
+
+### Features
+
+* configurable tool setup (mise/node/just), bump checkout to v6, add backlog ([13fb8ca](https://github.com/elpic/actions/commit/13fb8cac4a8c690b882e3e80ee840675a9a97963))
+
 ## 1.0.0 (2026-05-21)
 
 
