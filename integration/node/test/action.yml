@@ -1,0 +1,106 @@
+name: Node Test
+description: Run tests with coverage comparison against the main branch
+
+inputs:
+  test-coverage-task:
+    description: mise task that runs vitest with coverage and produces coverage/lcov.info
+    required: false
+    default: test:coverage
+  test-task:
+    description: mise task that runs tests without coverage
+    required: false
+    default: test
+  timeout-minutes:
+    description: Step timeout in minutes
+    required: false
+    default: "8"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: jdx/mise-action@v2
+
+    - name: Download main branch coverage
+      id: download-main-coverage
+      shell: bash
+      run: |
+        MAIN_SHA=$(git rev-parse origin/main 2>/dev/null || echo "")
+        echo "main_sha=$MAIN_SHA" >> $GITHUB_OUTPUT
+        if [ -n "$MAIN_SHA" ] && gh run download -n "coverage-$MAIN_SHA" --repo ${{ github.repository }} 2>/dev/null; then
+          echo "coverage_available=true" >> $GITHUB_OUTPUT
+          # Parse lcov.info to extract total line coverage
+          if [ -f coverage/lcov.info ]; then
+            TOTAL=$(grep -c "^DA:" coverage/lcov.info || true)
+            HIT=$(awk -F, '/^DA:/ {if ($2 > 0) hit++} END {print hit+0}' coverage/lcov.info)
+            if [ "$TOTAL" -gt 0 ]; then
+              pct=$(awk "BEGIN {printf \"%.2f\", $HIT / $TOTAL * 100}")
+            else
+              pct="0.00"
+            fi
+            echo "main_coverage=$pct" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "coverage_available=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run tests without coverage
+      if: steps.download-main-coverage.outputs.coverage_available == 'true'
+      shell: bash
+      run: mise run ${{ inputs.test-task }}
+
+    - name: Run tests with coverage
+      if: steps.download-main-coverage.outputs.coverage_available != 'true'
+      shell: bash
+      run: mise run ${{ inputs.test-coverage-task }}
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+
+    - name: Upload coverage artifact
+      if: hashFiles('coverage/lcov.info') != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-${{ github.event.pull_request.head.sha }}
+        path: coverage/lcov.info
+
+    - name: Calculate and comment coverage
+      if: hashFiles('coverage/lcov.info') != ''
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        # Calculate current coverage from lcov.info
+        # DA:line,count — count lines with count > 0 as hit
+        TOTAL=$(grep -c "^DA:" coverage/lcov.info || true)
+        HIT=$(awk -F, '/^DA:/ {if ($2 > 0) hit++} END {print hit+0}' coverage/lcov.info)
+        if [ "$TOTAL" -gt 0 ]; then
+          current=$(awk "BEGIN {printf \"%.2f\", $HIT / $TOTAL * 100}")
+        else
+          current="0.00"
+        fi
+
+        main="${{ steps.download-main-coverage.outputs.main_coverage }}"
+        main=${main:-0}
+        diff=$(awk "BEGIN {printf \"%.2f\", $current - $main}" 2>/dev/null || echo "0")
+
+        COMMENT="## Coverage Report
+
+        | Metric | Value |
+        |--------|-------|
+        | **This PR** | ${current}% |
+        | **Main Branch** | ${main}% |
+        | **Change** | ${diff}% |"
+
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        if [ -z "$PR_NUMBER" ]; then exit 0; fi
+
+        COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments \
+          --jq '.[] | select(.body | startswith("## Coverage Report")) | .id' 2>/dev/null | head -1)
+        if [ -n "$COMMENT_ID" ]; then
+          gh api repos/${{ github.repository }}/issues/comments/${COMMENT_ID} \
+            --method PATCH --field body="${COMMENT}"
+        else
+          gh pr comment ${PR_NUMBER} --body "${COMMENT}"
+        fi

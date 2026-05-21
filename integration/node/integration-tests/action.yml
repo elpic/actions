@@ -1,0 +1,27 @@
+name: Node Integration Tests
+description: Download the built artifact and run integration tests
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  integration-task:
+    description: mise task for integration tests
+    required: false
+    default: test:integration
+  output-path:
+    description: Glob pattern for where the artifact was extracted
+    required: false
+    default: dist/
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-build
+    - shell: bash
+      run: |
+        mise run ${{ inputs.integration-task }}
