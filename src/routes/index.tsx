@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   GitBranch,
   Workflow,
@@ -13,6 +13,7 @@ import {
   Zap,
   Layers,
 } from "lucide-react";
+import { ACTIONS } from "@/lib/actions-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -47,36 +48,36 @@ export const Route = createFileRoute("/")({
 
 const REPO = "https://github.com/elpic/actions";
 
-const categories = [
-  {
-    name: "integration",
+const categoryMeta: Record<string, { icon: typeof Workflow; blurb: string }> = {
+  integration: {
     icon: Workflow,
     blurb: "PR integration: test, lint, build, security",
-    items: ["go/test", "go/lint", "go/build", "go/integration-tests", "go/security", "python/test", "python/lint", "python/integration-tests", "python/security"],
-    accent: "primary",
   },
-  {
-    name: "delivery",
+  delivery: {
     icon: Package,
     blurb: "Release and publish to registries",
-    items: ["pypi/build", "pypi/publish"],
-    accent: "accent",
   },
-  {
-    name: "github",
+  github: {
     icon: Github,
     blurb: "GitHub-specific composite actions",
-    items: ["blueprint-check"],
-    accent: "primary",
   },
-  {
-    name: "utilities",
+  utilities: {
     icon: Wrench,
     blurb: "General-purpose composite actions",
-    items: ["setup-mise", "update-major-tag", "upsert-pr-comment"],
-    accent: "accent",
   },
-] as const;
+};
+
+const categoryOrder = ["integration", "delivery", "github", "utilities"] as const;
+
+const categories = categoryOrder.map((name) => {
+  const items = ACTIONS.filter((a) => a.category === name);
+  return {
+    name,
+    icon: categoryMeta[name].icon,
+    blurb: categoryMeta[name].blurb,
+    items,
+  };
+});
 
 const features = [
   {
