@@ -224,7 +224,7 @@ function Landing() {
                 / categories
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Eleven actions, organized by intent.
+                Twenty actions, organized by intent.
               </h2>
             </div>
             <a
