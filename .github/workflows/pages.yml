@@ -1,0 +1,55 @@
+# Build workflow for the GitHub Pages site.
+# When source code is pushed to the pages branch, builds the site
+# with Bun and commits the dist/ output so GitHub Pages serves the latest build.
+
+name: Pages Build
+
+on:
+  push:
+    branches: [pages]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: pages
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Commit and push build output
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Track dist/ for the build commit
+          echo '!dist' >> .gitignore
+
+          git add dist/ .gitignore
+
+          # Only commit if something changed
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "build: update dist from ${{ github.sha }}"
+          git push origin pages
