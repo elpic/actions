@@ -1,0 +1,580 @@
+[
+  {
+    "slug": "delivery-pypi-build",
+    "path": "delivery/pypi/build",
+    "category": "delivery",
+    "subcategory": "pypi",
+    "name": "PyPI Build",
+    "description": "Build a Python package wheel and upload it as an artifact",
+    "inputs": [
+      {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "pypi-package-dir",
+        "description": "Directory containing built artifacts (relative to repo root)",
+        "required": false,
+        "default": "dist"
+      },
+      {
+        "name": "build-task",
+        "description": "mise task that builds the package wheel",
+        "required": false,
+        "default": "build"
+      }
+    ]
+  },
+  {
+    "slug": "delivery-pypi-publish",
+    "path": "delivery/pypi/publish",
+    "category": "delivery",
+    "subcategory": "pypi",
+    "name": "PyPI Publish",
+    "description": "Publish a built Python package to PyPI using Trusted Publishing (OIDC)",
+    "inputs": [
+      {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "pypi-package-dir",
+        "description": "Directory containing built artifacts (relative to repo root)",
+        "required": false,
+        "default": "dist"
+      }
+    ]
+  },
+  {
+    "slug": "github-blueprint-check",
+    "path": "github/blueprint-check",
+    "category": "github",
+    "subcategory": null,
+    "name": "Blueprint Drift Check",
+    "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.",
+    "inputs": [
+      {
+        "name": "blueprint-file",
+        "description": "Path to the .bp file inside the repo (e.g. setup.bp)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "template",
+        "description": "Template path or @github shorthand (e.g. @github:elpic/templates@main:containers/python)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "against",
+        "description": "Directory or file to check against (e.g. . or src/)",
+        "required": true,
+        "default": null
+      }
+    ]
+  },
+  {
+    "slug": "integration-go-build",
+    "path": "integration/go/build",
+    "category": "integration",
+    "subcategory": "go",
+    "name": "Go Build",
+    "description": "Build the Go binary and upload it as an artifact",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "build-task",
+        "description": "mise task that builds the binary",
+        "required": false,
+        "default": "build"
+      }
+    ]
+  },
+  {
+    "slug": "integration-go-integration-tests",
+    "path": "integration/go/integration-tests",
+    "category": "integration",
+    "subcategory": "go",
+    "name": "Go Integration Tests",
+    "description": "Download the built artifact and run integration tests",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "integration-task",
+        "description": "mise task for integration tests",
+        "required": false,
+        "default": "test:integration"
+      }
+    ]
+  },
+  {
+    "slug": "integration-go-lint",
+    "path": "integration/go/lint",
+    "category": "integration",
+    "subcategory": "go",
+    "name": "Go Lint",
+    "description": "Run the Go linter via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "lint-task",
+        "description": "mise task for the linter",
+        "required": false,
+        "default": "lint"
+      }
+    ]
+  },
+  {
+    "slug": "integration-go-security",
+    "path": "integration/go/security",
+    "category": "integration",
+    "subcategory": "go",
+    "name": "Go Security",
+    "description": "Run security scans via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "security-task",
+        "description": "mise task for security scans",
+        "required": false,
+        "default": "security"
+      }
+    ]
+  },
+  {
+    "slug": "integration-go-test",
+    "path": "integration/go/test",
+    "category": "integration",
+    "subcategory": "go",
+    "name": "Go Test",
+    "description": "Run tests with coverage comparison against the main branch",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "test-coverage-task",
+        "description": "Task that runs tests and produces coverage.out",
+        "required": false,
+        "default": "test:coverage"
+      },
+      {
+        "name": "timeout-minutes",
+        "description": "Step timeout in minutes",
+        "required": false,
+        "default": "8"
+      }
+    ]
+  },
+  {
+    "slug": "integration-node-build",
+    "path": "integration/node/build",
+    "category": "integration",
+    "subcategory": "node",
+    "name": "Node Build",
+    "description": "Build the Node.js project and upload it as an artifact",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "build-task",
+        "description": "mise task that builds the project",
+        "required": false,
+        "default": "build"
+      }
+    ]
+  },
+  {
+    "slug": "integration-node-integration-tests",
+    "path": "integration/node/integration-tests",
+    "category": "integration",
+    "subcategory": "node",
+    "name": "Node Integration Tests",
+    "description": "Download the built artifact and run integration tests",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "integration-task",
+        "description": "mise task for integration tests",
+        "required": false,
+        "default": "test:integration"
+      }
+    ]
+  },
+  {
+    "slug": "integration-node-lint",
+    "path": "integration/node/lint",
+    "category": "integration",
+    "subcategory": "node",
+    "name": "Node Lint",
+    "description": "Run the Node.js linter via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "lint-task",
+        "description": "mise task for the linter",
+        "required": false,
+        "default": "lint"
+      }
+    ]
+  },
+  {
+    "slug": "integration-node-security",
+    "path": "integration/node/security",
+    "category": "integration",
+    "subcategory": "node",
+    "name": "Node Security",
+    "description": "Run security scans via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "security-task",
+        "description": "mise task for security scans",
+        "required": false,
+        "default": "security"
+      }
+    ]
+  },
+  {
+    "slug": "integration-node-test",
+    "path": "integration/node/test",
+    "category": "integration",
+    "subcategory": "node",
+    "name": "Node Test",
+    "description": "Run tests with coverage comparison against the main branch",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "test-coverage-task",
+        "description": "Task that runs vitest with coverage and produces coverage/lcov.info",
+        "required": false,
+        "default": "test:coverage"
+      },
+      {
+        "name": "test-task",
+        "description": "Task that runs tests without coverage",
+        "required": false,
+        "default": "test"
+      },
+      {
+        "name": "timeout-minutes",
+        "description": "Step timeout in minutes",
+        "required": false,
+        "default": "8"
+      }
+    ]
+  },
+  {
+    "slug": "integration-python-integration-tests",
+    "path": "integration/python/integration-tests",
+    "category": "integration",
+    "subcategory": "python",
+    "name": "Python Integration Tests",
+    "description": "Run integration tests via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "integration-task",
+        "description": "mise task for integration tests",
+        "required": false,
+        "default": "test:integration"
+      }
+    ]
+  },
+  {
+    "slug": "integration-python-lint",
+    "path": "integration/python/lint",
+    "category": "integration",
+    "subcategory": "python",
+    "name": "Python Lint",
+    "description": "Run the Python linter via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "lint-task",
+        "description": "mise task for the linter",
+        "required": false,
+        "default": "lint"
+      }
+    ]
+  },
+  {
+    "slug": "integration-python-security",
+    "path": "integration/python/security",
+    "category": "integration",
+    "subcategory": "python",
+    "name": "Python Security",
+    "description": "Run security scans via mise",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "security-task",
+        "description": "mise task for security scans",
+        "required": false,
+        "default": "security"
+      }
+    ]
+  },
+  {
+    "slug": "integration-python-test",
+    "path": "integration/python/test",
+    "category": "integration",
+    "subcategory": "python",
+    "name": "Python Test",
+    "description": "Run tests with coverage comparison against the main branch",
+    "inputs": [
+      {
+        "name": "setup",
+        "description": "Tool setup method (mise, node, just, none)",
+        "required": false,
+        "default": "mise"
+      },
+      {
+        "name": "node-version",
+        "description": "Node.js version (used when setup=node)",
+        "required": false,
+        "default": "20"
+      },
+      {
+        "name": "test-coverage-task",
+        "description": "Task that runs pytest and produces coverage.xml",
+        "required": false,
+        "default": "test:coverage"
+      },
+      {
+        "name": "test-task",
+        "description": "Task that runs tests without coverage",
+        "required": false,
+        "default": "test"
+      },
+      {
+        "name": "timeout-minutes",
+        "description": "Step timeout in minutes",
+        "required": false,
+        "default": "8"
+      }
+    ]
+  },
+  {
+    "slug": "utilities-setup-mise",
+    "path": "utilities/setup-mise",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Setup mise",
+    "description": "Checkout code and install mise (https://mise.jdx.dev)",
+    "inputs": [
+      {
+        "name": "fetch-depth",
+        "description": "Number of commits to fetch. 0 indicates all history (needed for blame, diff, and comparing against the base branch).",
+        "required": false,
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "slug": "utilities-update-major-tag",
+    "path": "utilities/update-major-tag",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Update Major Tag",
+    "description": "After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.",
+    "inputs": [
+      {
+        "name": "tag",
+        "description": "The semver tag that was just created (e.g. v1.2.3). Must already exist.",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "token",
+        "description": "GitHub token with permission to push tags",
+        "required": false,
+        "default": "${{ github.token }}"
+      },
+      {
+        "name": "update-minor",
+        "description": "Whether to also update the minor tag (e.g. v1.2)",
+        "required": false,
+        "default": "true"
+      }
+    ]
+  },
+  {
+    "slug": "utilities-upsert-pr-comment",
+    "path": "utilities/upsert-pr-comment",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Upsert PR Comment",
+    "description": "Post a new PR comment, update an existing one (matched by prefix), or delete it.",
+    "inputs": [
+      {
+        "name": "token",
+        "description": "GitHub token with permission to write PR comments",
+        "required": false,
+        "default": "${{ github.token }}"
+      },
+      {
+        "name": "comment-prefix",
+        "description": "The prefix string that identifies the comment (e.g. \"## Coverage Report\"). Used to find and update the existing comment instead of creating duplicates.",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "comment-body",
+        "description": "The full markdown body of the comment.",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "action",
+        "description": "Operation to perform. - upsert (default): create or update a comment matching the prefix - delete: remove the comment matching the prefix",
+        "required": false,
+        "default": "upsert"
+      }
+    ]
+  }
+]
