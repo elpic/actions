@@ -74,7 +74,8 @@ jobs:
           fi
 
           # Capture the real SSR-rendered HTML (includes full head meta + pre-rendered React)
-          curl -sS http://localhost:8788 > dist/client/index.html
+          # -L is needed because wrangler returns a 307 redirect to the final URL
+          curl -sSL http://localhost:8788 > dist/client/index.html
 
           # Stop the server
           kill $WRANGLER_PID 2>/dev/null || true
