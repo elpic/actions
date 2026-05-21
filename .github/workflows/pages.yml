@@ -1,6 +1,6 @@
 # Deploy the TanStack Start landing page to GitHub Pages.
-# Builds with Bun, generates a static index.html for the SPA client bundle,
-# then deploys via the standard GitHub Pages actions.
+# Builds with Bun, runs the SSR server locally via wrangler to capture
+# the real rendered HTML, then deploys via the standard GitHub Pages actions.
 
 name: Deploy static content to Pages
 
@@ -37,42 +37,49 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Generate index.html
+      - name: Capture SSR-rendered HTML
         run: |
-          node -e "
-          const fs = require('fs');
-          const path = require('path');
+          # Start the built Worker locally using miniflare (no auth needed).
+          # dist/server/wrangler.json already points to:
+          #   - main: index.js         (SSR server entry)
+          #   - assets.directory: ../client  (static files)
+          ./node_modules/.bin/wrangler dev \
+            --config dist/server/wrangler.json \
+            --port 8788 --ip localhost --inspector-port 0 --local &
+          WRANGLER_PID=$!
 
-          const assets = fs.readdirSync('dist/client/assets');
+          # Wait for the server to be ready (up to 30s)
+          SERVER_READY=false
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null http://localhost:8788 2>/dev/null; then
+              SERVER_READY=true
+              break
+            fi
+            sleep 1
+          done
 
-          // Pick the first CSS and sort JS files by size (smallest = entry point)
-          const css = assets.find(f => f.endsWith('.css'));
-          const js = assets
-            .filter(f => f.startsWith('index-') && f.endsWith('.js'))
-            .sort((a, b) => fs.statSync('dist/client/assets/' + a).size
-                           - fs.statSync('dist/client/assets/' + b).size)[0];
+          if [ "$SERVER_READY" = false ]; then
+            echo "ERROR: wrangler dev did not start within 30 seconds"
+            kill $WRANGLER_PID 2>/dev/null || true
+            exit 1
+          fi
 
-          if (!js) { console.error('no index-*.js found'); process.exit(1); }
+          # Capture the real SSR-rendered HTML (includes full head meta + pre-rendered React)
+          curl -sS http://localhost:8788 > dist/client/index.html
 
-          const h = [
-            '<!DOCTYPE html>',
-            '<html lang=\"en\">',
-            '<head>',
-            '  <meta charset=\"utf-8\" />',
-            '  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />',
-            css ? '  <link rel=\"stylesheet\" href=\"/assets/' + css + '\" />' : '',
-            '</head>',
-            '<body>',
-            '  <div id=\"root\"></div>',
-            '  <script type=\"module\" src=\"/assets/' + js + '\"></script>',
-            '</body>',
-            '</html>',
-          ].filter(Boolean).join('\n');
+          # Stop the server
+          kill $WRANGLER_PID 2>/dev/null || true
+          wait $WRANGLER_PID 2>/dev/null || true
 
-          fs.writeFileSync('dist/client/index.html', h);
-          const size = fs.statSync('dist/client/index.html').size;
-          console.log('Generated dist/client/index.html (' + size + ' bytes, JS=' + js + (css ? ', CSS=' + css : '') + ')');
-          "
+          # Verify the output
+          SIZE=$(wc -c < dist/client/index.html)
+          echo "Captured dist/client/index.html ($SIZE bytes)"
+          if [ "$SIZE" -lt 100 ]; then
+            echo "ERROR: captured HTML is too small ($SIZE bytes)"
+            head -5 dist/client/index.html
+            exit 1
+          fi
+          head -3 dist/client/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
