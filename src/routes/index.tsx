@@ -260,14 +260,22 @@ function Landing() {
                   </span>
                 </div>
                 <ul className="mt-5 flex flex-wrap gap-2">
-                  {cat.items.map((it) => (
-                    <li
-                      key={it}
-                      className="rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90"
-                    >
-                      {it}
-                    </li>
-                  ))}
+                  {cat.items.map((it) => {
+                    const label = it.subcategory
+                      ? `${it.subcategory}/${it.path.split("/").pop()}`
+                      : it.path.split("/").pop()!;
+                    return (
+                      <li key={it.slug}>
+                        <Link
+                          to="/actions/$slug"
+                          params={{ slug: it.slug }}
+                          className="inline-block rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary"
+                        >
+                          {label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
