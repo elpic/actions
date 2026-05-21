@@ -167,15 +167,17 @@ function Landing() {
                 <span className="h-3 w-3 rounded-full bg-chart-3/70" />
                 <span className="h-3 w-3 rounded-full bg-primary/70" />
                 <span className="ml-3 font-mono text-xs text-muted-foreground">
-                  .github/workflows/ci.yml
+                  .github/workflows/integration.yml
                 </span>
               </div>
               <pre className="overflow-x-auto px-5 py-4 font-mono text-[13px] leading-relaxed">
-<code><span className="text-muted-foreground">jobs:</span>{"\n"}
-  <span className="text-foreground">test:</span>{"\n"}
-    <span className="text-muted-foreground">runs-on:</span> <span className="text-accent">ubuntu-latest</span>{"\n"}
-    <span className="text-muted-foreground">steps:</span>{"\n"}
-      <span className="text-muted-foreground">-</span> <span className="text-muted-foreground">uses:</span> <span className="text-primary">elpic/actions/integration/go/test@v1</span></code>
+                <code dangerouslySetInnerHTML={{ __html:
+                  '<span class="text-muted-foreground">jobs:</span>\n' +
+                  '  <span class="text-foreground">test:</span>\n' +
+                  '    <span class="text-muted-foreground">runs-on:</span> <span class="text-accent">ubuntu-latest</span>\n' +
+                  '    <span class="text-muted-foreground">steps:</span>\n' +
+                  '      <span class="text-muted-foreground">-</span> <span class="text-muted-foreground">uses:</span> <span class="text-primary">elpic/actions/integration/go/test@v1</span>'
+                }} />
               </pre>
             </div>
           </div>
@@ -304,22 +306,24 @@ function Landing() {
                 </span>
               </div>
               <pre className="overflow-x-auto px-5 py-5 font-mono text-[13px] leading-relaxed">
-<code><span className="text-muted-foreground">name:</span> <span className="text-accent">PR</span>{"\n"}
-<span className="text-muted-foreground">on:</span> [<span className="text-accent">pull_request</span>]{"\n"}
-{"\n"}
-<span className="text-muted-foreground">jobs:</span>{"\n"}
-  <span className="text-foreground">lint:</span>{"\n"}
-    <span className="text-muted-foreground">runs-on:</span> <span className="text-accent">ubuntu-latest</span>{"\n"}
-    <span className="text-muted-foreground">steps:</span>{"\n"}
-      <span className="text-muted-foreground">-</span> <span className="text-muted-foreground">uses:</span> <span className="text-primary">elpic/actions/integration/python/lint@v1</span>{"\n"}
-  <span className="text-foreground">test:</span>{"\n"}
-    <span className="text-muted-foreground">runs-on:</span> <span className="text-accent">ubuntu-latest</span>{"\n"}
-    <span className="text-muted-foreground">steps:</span>{"\n"}
-      <span className="text-muted-foreground">-</span> <span className="text-muted-foreground">uses:</span> <span className="text-primary">elpic/actions/integration/python/test@v1</span>{"\n"}
-  <span className="text-foreground">security:</span>{"\n"}
-    <span className="text-muted-foreground">runs-on:</span> <span className="text-accent">ubuntu-latest</span>{"\n"}
-    <span className="text-muted-foreground">steps:</span>{"\n"}
-      <span className="text-muted-foreground">-</span> <span className="text-muted-foreground">uses:</span> <span className="text-primary">elpic/actions/integration/python/security@v1</span></code>
+                <code dangerouslySetInnerHTML={{ __html:
+                  '<span class="text-muted-foreground">name:</span> <span class="text-accent">PR</span>\n' +
+                  '<span class="text-muted-foreground">on:</span> [<span class="text-accent">pull_request</span>]\n' +
+                  '\n' +
+                  '<span class="text-muted-foreground">jobs:</span>\n' +
+                  '  <span class="text-foreground">lint:</span>\n' +
+                  '    <span class="text-muted-foreground">runs-on:</span> <span class="text-accent">ubuntu-latest</span>\n' +
+                  '    <span class="text-muted-foreground">steps:</span>\n' +
+                  '      <span class="text-muted-foreground">-</span> <span class="text-muted-foreground">uses:</span> <span class="text-primary">elpic/actions/integration/python/lint@v1</span>\n' +
+                  '  <span class="text-foreground">test:</span>\n' +
+                  '    <span class="text-muted-foreground">runs-on:</span> <span class="text-accent">ubuntu-latest</span>\n' +
+                  '    <span class="text-muted-foreground">steps:</span>\n' +
+                  '      <span class="text-muted-foreground">-</span> <span class="text-muted-foreground">uses:</span> <span class="text-primary">elpic/actions/integration/python/test@v1</span>\n' +
+                  '  <span class="text-foreground">security:</span>\n' +
+                  '    <span class="text-muted-foreground">runs-on:</span> <span class="text-accent">ubuntu-latest</span>\n' +
+                  '    <span class="text-muted-foreground">steps:</span>\n' +
+                  '      <span class="text-muted-foreground">-</span> <span class="text-muted-foreground">uses:</span> <span class="text-primary">elpic/actions/integration/python/security@v1</span>'
+                }} />
               </pre>
             </div>
           </div>
