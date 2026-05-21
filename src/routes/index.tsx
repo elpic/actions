@@ -17,17 +17,17 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "elpic/actions — Reusable GitHub Actions & CI/CD workflows" },
+      { title: "elpic/actions - Reusable GitHub Actions & integration/CD workflows" },
       {
         name: "description",
         content:
           "A curated collection of composite GitHub Actions for integration, delivery, and repo utilities. Drop-in steps for Go, Python, and PyPI pipelines.",
       },
-      { property: "og:title", content: "elpic/actions — Reusable GitHub Actions" },
+      { property: "og:title", content: "elpic/actions - Reusable GitHub Actions" },
       {
         property: "og:description",
         content:
-          "Composite GitHub Actions for CI, release, and delivery. Reference them from your workflow in a single line.",
+          "Composite GitHub Actions for integration, release, and delivery. Reference them from your workflow in a single line.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -41,7 +41,7 @@ const categories = [
   {
     name: "integration",
     icon: Workflow,
-    blurb: "PR CI — test, lint, build, security",
+    blurb: "PR integration: test, lint, build, security",
     items: ["go/test", "go/lint", "go/build", "go/integration-tests", "go/security", "python/test", "python/lint", "python/integration-tests", "python/security"],
     accent: "primary",
   },
@@ -72,12 +72,12 @@ const features = [
   {
     icon: Layers,
     title: "Composite by design",
-    body: "Each action ships a single action.yml — drop it into any job and it handles checkout and tooling internally.",
+    body: "Each action ships a single action.yml. Drop it into any job and it handles checkout and tooling internally.",
   },
   {
     icon: Tag,
     title: "Semantic versioning",
-    body: "Pin to v1, v1.2, or v1.2.3 — floating major tags move forward, immutable point releases stay put.",
+    body: "Pin to v1, v1.2, or v1.2.3. Floating major tags move forward, immutable point releases stay put.",
   },
   {
     icon: Shield,
@@ -130,16 +130,16 @@ function Landing() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              v1.0.0 — released today
+              v1.0.1 - released today
             </div>
             <h1 className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
               Reusable GitHub Actions,{" "}
               <span className="text-gradient">composed for real pipelines.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
-              A curated set of composite actions for CI, release, and repo
-              automation. Reference them from your workflow in a single line —
-              no bash scaffolding, no glue code.
+              A curated set of composite actions for integration, release, and repo
+              automation. Reference them from your workflow in a single line.
+              No bash scaffolding, no glue code.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <a
@@ -286,7 +286,7 @@ function Landing() {
               </p>
               <ul className="mt-6 space-y-3 text-sm">
                 {[
-                  "Drop-in composite steps — no custom runners required",
+                  "Drop-in composite steps. No custom runners required",
                   "Consistent inputs across language ecosystems",
                   "Conventional-commits release flow via release-please",
                 ].map((line) => (
