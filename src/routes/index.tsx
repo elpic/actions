@@ -17,17 +17,17 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "elpic/actions — Reusable GitHub Actions & CI/CD workflows" },
+      { title: "elpic/actions - Reusable GitHub Actions & integration/CD workflows" },
       {
         name: "description",
         content:
           "A curated collection of composite GitHub Actions for integration, delivery, and repo utilities. Drop-in steps for Go, Python, and PyPI pipelines.",
       },
-      { property: "og:title", content: "elpic/actions — Reusable GitHub Actions" },
+      { property: "og:title", content: "elpic/actions - Reusable GitHub Actions" },
       {
         property: "og:description",
         content:
-          "Composite GitHub Actions for CI, release, and delivery. Reference them from your workflow in a single line.",
+          "Composite GitHub Actions for integration, release, and delivery. Reference them from your workflow in a single line.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -41,7 +41,7 @@ const categories = [
   {
     name: "integration",
     icon: Workflow,
-    blurb: "PR CI — test, lint, build, security",
+    blurb: "PR integration: test, lint, build, security",
     items: ["go/test", "go/lint", "go/build", "go/integration-tests", "go/security", "python/test", "python/lint", "python/integration-tests", "python/security"],
     accent: "primary",
   },
@@ -77,7 +77,7 @@ const features = [
   {
     icon: Tag,
     title: "Semantic versioning",
-    body: "Pin to v1, v1.2, or v1.2.3 — floating major tags move forward, immutable point releases stay put.",
+    body: "Pin to v1, v1.2, or v1.2.3. Floating major tags move forward, immutable point releases stay put.",
   },
   {
     icon: Shield,
@@ -137,9 +137,9 @@ function Landing() {
               <span className="text-gradient">composed for real pipelines.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
-              A curated set of composite actions for CI, release, and repo
-              automation. Reference them from your workflow in a single line —
-              no bash scaffolding, no glue code.
+              A curated set of composite actions for integration, release, and repo
+              automation. Reference them from your workflow in a single line.
+              No bash scaffolding, no glue code.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <a
