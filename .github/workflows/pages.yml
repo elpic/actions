@@ -37,51 +37,30 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Generate index.html
+      - name: Capture SSR-rendered HTML
         run: |
-          node -e "
-          const fs = require('fs');
-          const path = require('path');
+          # Start the built Worker locally via the dist/server/wrangler.json
+          # (already configured with main: index.js and assets.directory: ../client).
+          # Run from project root so node_modules are resolvable.
+          npx wrangler dev \
+            --config dist/server/wrangler.json \
+            --port 8788 --ip localhost --inspector-port 0 &
+          WRANGLER_PID=$!
 
-          const assetsDir = 'dist/client/assets';
-          const files = fs.readdirSync(assetsDir);
+          # Wait for the server to be ready
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null http://localhost:8788 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
 
-          const css = files.find(f => f.endsWith('.css')) || '';
-          const jsFiles = files.filter(f => f.startsWith('index-') && f.endsWith('.js'));
-          const js = jsFiles.sort((a, b) =>
-            fs.statSync(path.join(assetsDir, a)).size - fs.statSync(path.join(assetsDir, b)).size
-          )[0];
+          # Capture the real SSR-rendered HTML
+          curl -s http://localhost:8788 > dist/client/index.html
+          kill $WRANGLER_PID 2>/dev/null || true
+          wait $WRANGLER_PID 2>/dev/null || true
 
-          if (!js) {
-            console.error('ERROR: no index-*.js found in', assetsDir);
-            process.exit(1);
-          }
-
-          const html = [
-            '<!DOCTYPE html>',
-            '<html lang=\"en\">',
-            '<head>',
-            '  <meta charset=\"utf-8\" />',
-            '  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />',
-            '  <meta name=\"description\" content=\"elpic/actions - Reusable GitHub Actions, integration and delivery composite workflow templates\" />',
-            '  <meta property=\"og:title\" content=\"elpic/actions - Reusable GitHub Actions\" />',
-            '  <meta property=\"og:description\" content=\"Composite GitHub Actions for integration, release, and delivery.\" />',
-            '  <meta property=\"og:type\" content=\"website\" />',
-            '  <title>elpic/actions - Reusable GitHub Actions</title>',
-            css ? '  <link rel=\"stylesheet\" href=\"/assets/' + css + '\" />' : '',
-            '</head>',
-            '<body>',
-            '  <div id=\"root\"></div>',
-            '  <script type=\"module\" src=\"/assets/' + js + '\"></script>',
-            '</body>',
-            '</html>'
-          ].filter(Boolean).join('\n');
-
-          fs.writeFileSync('dist/client/index.html', html);
-          console.log('Generated dist/client/index.html');
-          console.log('  CSS:', css || '(none)');
-          console.log('  JS:', js);
-          "
+          echo "Captured dist/client/index.html ($(wc -c < dist/client/index.html) bytes)"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
