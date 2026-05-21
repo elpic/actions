@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# CI / Build
+__pycache__/
+*.pyc
+*.pyo
+dist/
+build/
+*.egg-info/
+.coverage
+coverage.out
+coverage.xml
+*.test
+*.out
+*.testbin
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+
+# Misc
+*.log

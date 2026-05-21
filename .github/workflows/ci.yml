@@ -1,0 +1,77 @@
+# CI for the actions repository itself.
+# Validates that all action.yml files are syntactically correct
+# and that README.md files follow the expected template.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate action.yml files
+        shell: bash
+        run: |
+          errors=0
+          while IFS= read -r -d '' f; do
+            dir=$(dirname "$f")
+            echo "Checking $f ..."
+            # Must be valid YAML with a "runs" key
+            if ! yq -e '.runs' "$f" >/dev/null 2>&1; then
+              echo "  ERROR: missing 'runs' key"
+              errors=$((errors + 1))
+            fi
+            # Must have a "name" key
+            if ! yq -e '.name' "$f" >/dev/null 2>&1; then
+              echo "  ERROR: missing 'name' key"
+              errors=$((errors + 1))
+            fi
+            # Must have a "description" key
+            if ! yq -e '.description' "$f" >/dev/null 2>&1; then
+              echo "  ERROR: missing 'description' key"
+              errors=$((errors + 1))
+            fi
+            # Must use composite
+            using=$(yq '.runs.using' "$f")
+            if [ "$using" != "composite" ]; then
+              echo "  ERROR: runs.using must be 'composite', got '$using'"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name 'action.yml' -print0)
+
+          if [ "$errors" -gt 0 ]; then
+            echo "---"
+            echo "Found $errors validation error(s)"
+            exit 1
+          fi
+          echo "All action.yml files are valid."
+
+      - name: Check every action has a README
+        shell: bash
+        run: |
+          errors=0
+          while IFS= read -r -d '' f; do
+            dir=$(dirname "$f")
+            if [ ! -f "$dir/README.md" ]; then
+              echo "ERROR: $dir has action.yml but no README.md"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name 'action.yml' -print0)
+
+          if [ "$errors" -gt 0 ]; then
+            echo "Found $errors action(s) missing README.md"
+            exit 1
+          fi
+          echo "All actions have a README.md."

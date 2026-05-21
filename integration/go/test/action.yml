@@ -1,0 +1,77 @@
+name: Go Test
+description: Run tests with coverage comparison against the main branch
+
+inputs:
+  test-coverage-task:
+    description: mise task that runs tests and produces coverage.out
+    required: false
+    default: test:coverage
+  timeout-minutes:
+    description: Step timeout in minutes
+    required: false
+    default: "8"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: jdx/mise-action@v2
+
+    - name: Download main branch coverage
+      id: download-main-coverage
+      shell: bash
+      run: |
+        MAIN_SHA=$(git rev-parse origin/main 2>/dev/null || echo "")
+        echo "main_sha=$MAIN_SHA" >> $GITHUB_OUTPUT
+        if [ -n "$MAIN_SHA" ] && gh run download -n "coverage-$MAIN_SHA" --repo ${{ github.repository }} 2>/dev/null; then
+          echo "coverage_available=true" >> $GITHUB_OUTPUT
+          echo "main_coverage=$(go tool cover -func coverage.out 2>/dev/null | grep total | awk '{print $3}' | sed 's/%//')" >> $GITHUB_OUTPUT
+        else
+          echo "coverage_available=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run tests with coverage
+      shell: bash
+      run: mise run ${{ inputs.test-coverage-task }}
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+
+    - name: Upload coverage artifact
+      if: hashFiles('coverage.out') != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-${{ github.event.pull_request.head.sha }}
+        path: coverage.*
+
+    - name: Calculate and comment coverage
+      if: hashFiles('coverage.out') != ''
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        current=$(go tool cover -func coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+        main="${{ steps.download-main-coverage.outputs.main_coverage }}"
+        main=${main:-0}
+        diff=$(echo "$current - $main" | bc 2>/dev/null || echo "0")
+
+        COMMENT="## Coverage Report
+
+        | Metric | Value |
+        |--------|-------|
+        | **This PR** | ${current}% |
+        | **Main Branch** | ${main}% |
+        | **Change** | ${diff}% |"
+
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        if [ -z "$PR_NUMBER" ]; then exit 0; fi
+
+        COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments \
+          --jq '.[] | select(.body | startswith("## Coverage Report")) | .id' 2>/dev/null | head -1)
+        if [ -n "$COMMENT_ID" ]; then
+          gh api repos/${{ github.repository }}/issues/comments/${COMMENT_ID} \
+            --method PATCH --field body="${COMMENT}"
+        else
+          gh pr comment ${PR_NUMBER} --body "${COMMENT}"
+        fi

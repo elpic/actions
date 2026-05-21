@@ -1,0 +1,46 @@
+# Release workflow for the actions repository.
+# Uses release-please to create semver releases based on Conventional Commits.
+# After a release is published, updates the major floating tag (v1, v2, ...).
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: simple
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  update-major-tag:
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    needs: [release-please]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Uses local path since this action lives in the same repo.
+      # Once v1 is published, this can switch to:
+      #   uses: elpic/actions/utilities/update-major-tag@v1
+      - uses: ./utilities/update-major-tag
+        with:
+          tag: ${{ needs.release-please.outputs.tag_name }}

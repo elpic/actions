@@ -1,0 +1,16 @@
+name: Python Security
+description: Run security scans via mise
+
+inputs:
+  security-task:
+    description: mise task for security scans
+    required: false
+    default: security
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - shell: bash
+      run: mise run ${{ inputs.security-task }}

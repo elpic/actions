@@ -1,0 +1,80 @@
+name: Blueprint Drift Check
+description: >
+  Run blueprint check on a PR and post a comment if drift is detected.
+  Automatically removes the comment when drift is resolved.
+
+inputs:
+  blueprint-file:
+    description: Path to the .bp file inside the repo (e.g. setup.bp)
+    required: true
+  template:
+    description: Template path or @github shorthand (e.g. @github:elpic/templates@main:containers/python)
+    required: true
+  against:
+    description: Directory or file to check against (e.g. . or src/)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Install blueprint
+      shell: bash
+      run: curl -fsSL https://install.getbp.dev | sh
+
+    - name: Run blueprint check
+      id: check
+      shell: bash
+      run: |
+        blueprint check ${{ inputs.blueprint-file }} \
+          --template ${{ inputs.template }} \
+          --against ${{ inputs.against }}
+      continue-on-error: true
+
+    - name: Post drift comment on PR
+      if: steps.check.outcome == 'failure'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        COMMENT="## Blueprint Drift Detected
+
+        One or more rendered files are out of date with their template.
+
+        **Blueprint file:** ${{ inputs.blueprint-file }}
+        **Template:** ${{ inputs.template }}
+        **Against:** ${{ inputs.against }}
+
+        Run locally to regenerate:
+        \`\`\`bash
+        blueprint render ${{ inputs.blueprint-file }} --template ${{ inputs.template }} --output ${{ inputs.against }}
+        \`\`\`"
+
+        COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments \
+          --jq '.[] | select(.body | startswith("## Blueprint Drift Detected")) | .id' 2>/dev/null | head -1)
+        if [ -n "$COMMENT_ID" ]; then
+          gh api repos/${{ github.repository }}/issues/comments/${COMMENT_ID} \
+            --method PATCH --field body="${COMMENT}"
+        else
+          gh pr comment ${PR_NUMBER} --body "${COMMENT}"
+        fi
+
+    - name: Remove resolved drift comment
+      if: steps.check.outcome == 'success'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments \
+          --jq '.[] | select(.body | startswith("## Blueprint Drift Detected")) | .id' 2>/dev/null | head -1)
+        if [ -n "$COMMENT_ID" ]; then
+          gh api repos/${{ github.repository }}/issues/comments/${COMMENT_ID} --method DELETE
+        fi
+
+    - name: Fail if drift detected
+      if: steps.check.outcome == 'failure'
+      shell: bash
+      run: exit 1

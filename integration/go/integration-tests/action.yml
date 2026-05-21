@@ -1,0 +1,24 @@
+name: Go Integration Tests
+description: Download the built artifact and run integration tests
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  integration-task:
+    description: mise task for integration tests
+    required: false
+    default: test:integration
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-binaries
+    - shell: bash
+      run: |
+        chmod +x ${{ inputs.app-name }}-*
+        mise run ${{ inputs.integration-task }}

@@ -1,0 +1,58 @@
+name: Upsert PR Comment
+description: >
+  Post a new PR comment, update an existing one (matched by prefix), or delete it.
+
+inputs:
+  token:
+    description: GitHub token with permission to write PR comments
+    required: false
+    default: ${{ github.token }}
+  comment-prefix:
+    description: >
+      The prefix string that identifies the comment (e.g. "## Coverage Report").
+      Used to find and update the existing comment instead of creating duplicates.
+    required: true
+  comment-body:
+    description: The full markdown body of the comment.
+    required: false
+    default: ""
+  action:
+    description: >
+      Operation to perform.
+      - upsert (default): create or update a comment matching the prefix
+      - delete: remove the comment matching the prefix
+    required: false
+    default: upsert
+
+runs:
+  using: composite
+  steps:
+    - name: Manage PR Comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        COMMENT_PREFIX: ${{ inputs.comment-prefix }}
+        COMMENT_BODY: ${{ inputs.comment-body }}
+        ACTION: ${{ inputs.action }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+
+        if [ "$ACTION" = "delete" ]; then
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq '.[] | select(.body | startswith(env.COMMENT_PREFIX)) | .id' 2>/dev/null | head -1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" --method DELETE
+            echo "Deleted comment $COMMENT_ID"
+          fi
+        else
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq '.[] | select(.body | startswith(env.COMMENT_PREFIX)) | .id' 2>/dev/null | head -1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" \
+              --method PATCH --field body="${COMMENT_BODY}"
+            echo "Updated comment $COMMENT_ID"
+          else
+            gh pr comment "${PR_NUMBER}" --body "${COMMENT_BODY}"
+            echo "Created new comment"
+          fi
+        fi

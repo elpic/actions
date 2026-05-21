@@ -1,0 +1,57 @@
+name: Update Major Tag
+description: >
+  After tagging a new semver release (e.g. v1.2.3), update the major (v1)
+  and minor (v1.2) floating tags so users pinning to @v1 always get the
+  latest v1.x release.
+
+inputs:
+  tag:
+    description: The semver tag that was just created (e.g. v1.2.3). Must already exist.
+    required: true
+  token:
+    description: GitHub token with permission to push tags
+    required: false
+    default: ${{ github.token }}
+  update-minor:
+    description: Whether to also update the minor tag (e.g. v1.2)
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Update major version tags
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+
+        TAG="${{ inputs.tag }}"
+        TAG="${TAG#v}"
+
+        if ! echo "$TAG" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "Error: tag '$TAG' does not match semver format (major.minor.patch)"
+          exit 1
+        fi
+
+        MAJOR=$(echo "$TAG" | cut -d. -f1)
+        MINOR=$(echo "$TAG" | cut -d. -f2)
+
+        # Update major tag (v1, v2, ...)
+        MAJOR_TAG="v${MAJOR}"
+        git tag -f "${MAJOR_TAG}" HEAD
+        git push -f origin "${MAJOR_TAG}"
+
+        # Update minor tag (v1.0, v1.2, ...)
+        if [ "${{ inputs.update-minor }}" = "true" ]; then
+          MINOR_TAG="v${MAJOR}.${MINOR}"
+          git tag -f "${MINOR_TAG}" HEAD
+          git push -f origin "${MINOR_TAG}"
+        fi
+
+        echo "Updated ${MAJOR_TAG} → ${TAG}"

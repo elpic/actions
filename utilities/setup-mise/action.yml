@@ -1,0 +1,19 @@
+name: Setup mise
+description: Checkout code and install mise (https://mise.jdx.dev)
+
+inputs:
+  fetch-depth:
+    description: >
+      Number of commits to fetch. 0 indicates all history (needed for blame,
+      diff, and comparing against the base branch).
+    required: false
+    default: "0"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - uses: jdx/mise-action@v2

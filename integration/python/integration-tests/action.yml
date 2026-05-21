@@ -1,0 +1,16 @@
+name: Python Integration Tests
+description: Run integration tests via mise
+
+inputs:
+  integration-task:
+    description: mise task for integration tests
+    required: false
+    default: test:integration
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - shell: bash
+      run: mise run ${{ inputs.integration-task }}
