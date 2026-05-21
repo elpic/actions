@@ -18,6 +18,12 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  # Vite base path — must match the GitHub Pages URL subpath.
+  # For user/org sites (username.github.io) this is empty.
+  # For project sites (username.github.io/repo) this is /repo.
+  BASE_PATH: /${{ github.event.repository.name }}
+
 jobs:
   deploy:
     environment:
@@ -28,14 +34,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: bun run build
+      - name: Build with base path
+        run: bun run build -- --base=${{ env.BASE_PATH }}/ --manifest
 
       - name: Capture SSR-rendered HTML
         run: |
@@ -80,9 +89,6 @@ jobs:
             exit 1
           fi
           head -3 dist/client/index.html
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
