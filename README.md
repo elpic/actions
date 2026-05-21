@@ -1,6 +1,6 @@
 # Actions
 
-Reusable GitHub Actions and CI/CD composite workflow templates organised by category.
+Reusable GitHub Actions, integration and delivery composite workflow templates organised by category.
 
 [![Release](https://img.shields.io/github/v/release/elpic/actions)](https://github.com/elpic/actions/releases)
 [![Integration](https://github.com/elpic/actions/actions/workflows/integration.yml/badge.svg)](https://github.com/elpic/actions/actions/workflows/integration.yml)
