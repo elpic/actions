@@ -17,7 +17,7 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "elpic/actions - Reusable GitHub Actions & integration/CD workflows" },
+      { title: "elpic/actions - Reusable GitHub Actions for integration & delivery" },
       {
         name: "description",
         content:
@@ -30,6 +30,16 @@ export const Route = createFileRoute("/")({
           "Composite GitHub Actions for integration, release, and delivery. Reference them from your workflow in a single line.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://action-showcase-star.lovable.app/" },
+      { name: "twitter:title", content: "elpic/actions - Reusable GitHub Actions" },
+      {
+        name: "twitter:description",
+        content:
+          "Composite GitHub Actions for integration, release, and delivery.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://action-showcase-star.lovable.app/" },
     ],
   }),
   component: Landing,
