@@ -1,12 +1,12 @@
-# Build workflow for the pages branch (GitHub Pages site).
-# On push to main, checks out the pages source, builds with Bun,
-# and opens a PR against the pages branch with the updated dist.
+# Build workflow for the GitHub Pages site.
+# When source code is pushed to the pages branch, builds the site
+# with Bun and commits the dist/ output so GitHub Pages serves the latest build.
 
 name: Pages Build
 
 on:
   push:
-    branches: [main]
+    branches: [pages]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,7 +14,6 @@ concurrency:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   build:
@@ -36,37 +35,21 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Prepare build output
-        run: |
-          # Temporarily track dist/ for the build commit
-          echo '!dist' >> .gitignore
-
-      - name: Commit and push build branch
-        id: commit
+      - name: Commit and push build output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          BRANCH="pages-build/${{ github.run_id }}"
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          # Track dist/ for the build commit
+          echo '!dist' >> .gitignore
 
-          git checkout -b "$BRANCH"
           git add dist/ .gitignore
-          git commit -m "build: update pages dist from main@${{ github.sha }}"
 
-          git push origin "$BRANCH"
+          # Only commit if something changed
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
 
-      - name: Create pull request against pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          PR_URL=$(gh pr create \
-            --repo ${{ github.repository }} \
-            --base pages \
-            --head "${{ steps.commit.outputs.branch }}" \
-            --title "build: update pages dist from main@${{ github.sha }}" \
-            --body "Automated build of the pages site triggered by commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) on \`main\`.
-
-          Review the built output and squash-merge to deploy to GitHub Pages.")
-
-          echo "PR created: $PR_URL"
+          git commit -m "build: update dist from ${{ github.sha }}"
+          git push origin pages
