@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://action-showcase-star.lovable.app/sitemap.xml
+Sitemap: https://elpic.github.io/actions/sitemap.xml
