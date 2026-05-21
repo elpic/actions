@@ -5,7 +5,7 @@ Run the Python linter (ruff + mypy) via mise.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

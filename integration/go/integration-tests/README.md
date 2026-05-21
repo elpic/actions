@@ -5,7 +5,7 @@ Download artifact and run Go integration tests.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

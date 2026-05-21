@@ -5,7 +5,7 @@ Build the Node.js project and upload it as an artifact.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

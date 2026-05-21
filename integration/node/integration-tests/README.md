@@ -5,7 +5,7 @@ Download artifact and run Node.js integration tests.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

@@ -9,7 +9,7 @@ Downloads the main branch's coverage artifact, runs the current PR's tests, calc
 ### Default (mise)
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

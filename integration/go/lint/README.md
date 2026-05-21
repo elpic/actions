@@ -5,7 +5,7 @@ Run the Go linter via mise.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]

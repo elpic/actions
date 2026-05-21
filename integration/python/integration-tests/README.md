@@ -5,7 +5,7 @@ Run Python integration tests via mise.
 ## Usage
 
 ```yaml
-name: CI
+name: Integration
 on:
   pull_request:
     branches: [main]
