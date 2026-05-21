@@ -7,6 +7,7 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +29,12 @@ jobs:
         with:
           release-type: simple
           token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
+  # Update floating major/minor tags (v1, v1.2) after a release.
+  # The composite action handles its own checkout internally.
+  # We also checkout here so the local path reference (./utilities/...) resolves.
   update-major-tag:
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     needs: [release-please]
