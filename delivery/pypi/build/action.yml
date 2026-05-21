@@ -1,0 +1,34 @@
+name: PyPI Build
+description: Build a Python package wheel and upload it as an artifact
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  pypi-package-dir:
+    description: Directory containing built artifacts (relative to repo root)
+    required: false
+    default: dist
+  build-task:
+    description: mise task that builds the package wheel
+    required: false
+    default: build
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: jdx/mise-action@v2
+
+    - name: Build package
+      shell: bash
+      env:
+        DEV_BUILD: ${{ github.event_name != 'workflow_dispatch' && needs.release-please.outputs.release_created != 'true' && github.run_number || '' }}
+        RELEASE_VERSION: ${{ github.event.inputs.version || '' }}
+      run: mise run ${{ inputs.build-task }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-dist
+        path: ${{ inputs.pypi-package-dir }}
