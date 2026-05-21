@@ -1,23 +1,42 @@
 # integration/node/integration-tests
 
-Download the built artifact and run integration tests.
+Download artifact and run Node.js integration tests.
 
 ## Usage
 
 ```yaml
+name: CI
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  integration:
+  integration-tests:
     runs-on: ubuntu-latest
-    needs: [build]
+    timeout-minutes: 10
     steps:
       - uses: elpic/actions/integration/node/integration-tests@v1
-        with:
-          app-name: myapp
 ```
+### With just
 
+```yaml
+      - uses: elpic/actions/integration/node/integration-tests@v1
+        with:
+          setup: just
+          integration-task: test:integration
+```
 ## Inputs
 
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `app-name` | yes | — | Artifact name |
-| `integration-task` | no | `test:integration` | mise task for integration tests |
+| `setup` | no | `mise` | Tool setup method -- `mise`, `node`, `just`, or `none` |
+| `node-version` | no | `20` | Node.js version (used when `setup=node`) |
+| `integration-task` | no | `test:integration` | Task to run |
+
+## Notes
+
+Your project needs a task named `test:integration` (or override via `integration-task`).
