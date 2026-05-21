@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   GitBranch,
   Workflow,
@@ -13,6 +13,7 @@ import {
   Zap,
   Layers,
 } from "lucide-react";
+import { ACTIONS } from "@/lib/actions-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -47,36 +48,36 @@ export const Route = createFileRoute("/")({
 
 const REPO = "https://github.com/elpic/actions";
 
-const categories = [
-  {
-    name: "integration",
+const categoryMeta: Record<string, { icon: typeof Workflow; blurb: string }> = {
+  integration: {
     icon: Workflow,
     blurb: "PR integration: test, lint, build, security",
-    items: ["go/test", "go/lint", "go/build", "go/integration-tests", "go/security", "python/test", "python/lint", "python/integration-tests", "python/security"],
-    accent: "primary",
   },
-  {
-    name: "delivery",
+  delivery: {
     icon: Package,
     blurb: "Release and publish to registries",
-    items: ["pypi/build", "pypi/publish"],
-    accent: "accent",
   },
-  {
-    name: "github",
+  github: {
     icon: Github,
     blurb: "GitHub-specific composite actions",
-    items: ["blueprint-check"],
-    accent: "primary",
   },
-  {
-    name: "utilities",
+  utilities: {
     icon: Wrench,
     blurb: "General-purpose composite actions",
-    items: ["setup-mise", "update-major-tag", "upsert-pr-comment"],
-    accent: "accent",
   },
-] as const;
+};
+
+const categoryOrder = ["integration", "delivery", "github", "utilities"] as const;
+
+const categories = categoryOrder.map((name) => {
+  const items = ACTIONS.filter((a) => a.category === name);
+  return {
+    name,
+    icon: categoryMeta[name].icon,
+    blurb: categoryMeta[name].blurb,
+    items,
+  };
+});
 
 const features = [
   {
@@ -223,7 +224,7 @@ function Landing() {
                 / categories
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Eleven actions, organized by intent.
+                Twenty actions, organized by intent.
               </h2>
             </div>
             <a
@@ -259,14 +260,22 @@ function Landing() {
                   </span>
                 </div>
                 <ul className="mt-5 flex flex-wrap gap-2">
-                  {cat.items.map((it) => (
-                    <li
-                      key={it}
-                      className="rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90"
-                    >
-                      {it}
-                    </li>
-                  ))}
+                  {cat.items.map((it) => {
+                    const label = it.subcategory
+                      ? `${it.subcategory}/${it.path.split("/").pop()}`
+                      : it.path.split("/").pop()!;
+                    return (
+                      <li key={it.slug}>
+                        <Link
+                          to="/actions/$slug"
+                          params={{ slug: it.slug }}
+                          className="inline-block rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary"
+                        >
+                          {label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

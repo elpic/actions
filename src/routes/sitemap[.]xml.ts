@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { ACTIONS } from "@/lib/actions-data";
 
 const BASE_URL = "https://elpic.github.io/actions";
 
@@ -9,6 +10,11 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          ...ACTIONS.map((a) => ({
+            path: `/actions/${a.slug}`,
+            changefreq: "monthly",
+            priority: "0.7",
+          })),
         ];
 
         const urls = entries
