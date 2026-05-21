@@ -1,6 +1,6 @@
 # github/blueprint-check
 
-Composite action that runs `blueprint check` on a PR and posts a comment if drift is detected. The comment is automatically removed when drift is resolved.
+Run `blueprint check` on a PR. Posts a drift comment when detected, removes it when resolved.
 
 ## Usage
 
@@ -31,5 +31,5 @@ jobs:
 | Input | Required | Description |
 |-------|----------|-------------|
 | `blueprint-file` | yes | Path to the `.bp` file (e.g. `setup.bp`) |
-| `template` | yes | Template path or `@github:` shorthand (e.g. `.` or `@github:elpic/templates@main:containers/python`) |
-| `against` | yes | Directory or file to check against (e.g. `.` or `src/`) |
+| `template` | yes | Template path or `@github:` shorthand |
+| `against` | yes | Directory or file to check against |

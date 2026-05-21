@@ -1,13 +1,51 @@
 # integration/node/security
 
-Run security scans (npm audit, etc.) via mise.
+Run Node.js security scans (npm audit) via mise.
 
 ## Usage
 
 ```yaml
+name: Integration
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   security:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: elpic/actions/integration/node/security@v1
 ```
+### With setup-node
+
+```yaml
+      - uses: elpic/actions/integration/node/security@v1
+        with:
+          setup: node
+          node-version: '22'
+          security-task: security
+```
+### With just
+
+```yaml
+      - uses: elpic/actions/integration/node/security@v1
+        with:
+          setup: just
+          security-task: security
+```
+## Inputs
+
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `setup` | no | `mise` | Tool setup method -- `mise`, `node`, `just`, or `none` |
+| `node-version` | no | `20` | Node.js version (used when `setup=node`) |
+| `security-task` | no | `security` | Task to run |
+
+## Notes
+
+Your project needs a task named `security` (or override via `security-task`).
