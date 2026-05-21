@@ -1,0 +1,27 @@
+name: Node Build
+description: Build the Node.js project and upload it as an artifact
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  build-task:
+    description: mise task that builds the project
+    required: false
+    default: build
+  output-path:
+    description: Glob pattern for built output (e.g. dist/* or out/*)
+    required: false
+    default: dist/
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - shell: bash
+      run: mise run ${{ inputs.build-task }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-build
+        path: ${{ inputs.output-path }}

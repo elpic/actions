@@ -9,4 +9,5 @@ Each action handles its own checkout and tooling. Compose them in your workflow 
 | Language | Actions |
 |----------|---------|
 | [`go/`](go/) | test, lint, build, integration-tests, security |
+| [`node/`](node/) | test, lint, build, integration-tests, security |
 | [`python/`](python/) | test, lint, integration-tests, security |

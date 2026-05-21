@@ -1,0 +1,16 @@
+name: Node Lint
+description: Run the Node.js linter via mise
+
+inputs:
+  lint-task:
+    description: mise task for the linter
+    required: false
+    default: lint
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+    - shell: bash
+      run: mise run ${{ inputs.lint-task }}
