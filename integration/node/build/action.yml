@@ -2,26 +2,39 @@ name: Node Build
 description: Build the Node.js project and upload it as an artifact
 
 inputs:
-  app-name:
-    description: Application name; used in artifact names
-    required: true
+  setup:
+    description: Tool setup method (mise, node, just, none)
+    required: false
+    default: mise
+  node-version:
+    description: Node.js version (used when setup=node)
+    required: false
+    default: "20"
   build-task:
     description: mise task that builds the project
     required: false
     default: build
-  output-path:
-    description: Glob pattern for built output (e.g. dist/* or out/*)
-    required: false
-    default: dist/
 
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-    - uses: jdx/mise-action@v2
-    - shell: bash
-      run: mise run ${{ inputs.build-task }}
-    - uses: actions/upload-artifact@v4
+    - uses: actions/checkout@v6
+    - if: inputs.setup == 'mise'
+      uses: jdx/mise-action@v2
+    - if: inputs.setup == 'node'
+      uses: actions/setup-node@v4
       with:
-        name: ${{ inputs.app-name }}-build
-        path: ${{ inputs.output-path }}
+        node-version: ${{ inputs.node-version }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: |
+        curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+    - if: inputs.setup == 'mise'
+      shell: bash
+      run: mise run ${{ inputs.build-task }}
+    - if: inputs.setup == 'node'
+      shell: bash
+      run: npm run ${{ inputs.build-task }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: just ${{ inputs.build-task }}
