@@ -44,7 +44,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build with base path
-        run: bun run build -- --base=${{ env.BASE_PATH }}/ --manifest
+        run: bun run build -- --base=${{ env.BASE_PATH }}/
 
       - name: Capture SSR-rendered HTML
         run: |
