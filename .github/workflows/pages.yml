@@ -1,8 +1,8 @@
-# Deploy the TanStack Start landing page to Cloudflare Pages.
-# Builds with Bun, then publishes via Wrangler.
-# Trigger: push to pages branch, or manual workflow_dispatch.
+# Deploy the TanStack Start landing page to GitHub Pages.
+# Builds with Bun, generates a static index.html for the SPA client bundle,
+# then deploys via the standard GitHub Pages actions.
 
-name: Deploy to Cloudflare Pages
+name: Deploy static content to Pages
 
 on:
   push:
@@ -11,11 +11,19 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,8 +37,51 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+      - name: Generate index.html
+        run: |
+          CLIENT_DIR="dist/client"
+          ASSETS_DIR="$CLIENT_DIR/assets"
+
+          # Find CSS and JS files (content-hashed filenames)
+          CSS=$(ls "$ASSETS_DIR"/styles-*.css 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "")
+          JS=$(ls "$ASSETS_DIR"/index-*.js 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "")
+
+          if [ -z "$JS" ]; then
+            echo "ERROR: no index-*.js found in $ASSETS_DIR"
+            exit 1
+          fi
+
+          cat > "$CLIENT_DIR/index.html" <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="description" content="elpic/actions - Reusable GitHub Actions, integration and delivery composite workflow templates" />
+            <meta property="og:title" content="elpic/actions - Reusable GitHub Actions" />
+            <meta property="og:description" content="Composite GitHub Actions for integration, release, and delivery." />
+            <meta property="og:type" content="website" />
+            <title>elpic/actions - Reusable GitHub Actions</title>
+            $(if [ -n "$CSS" ]; then echo "<link rel=\"stylesheet\" href=\"/assets/$CSS\" />"; fi)
+          </head>
+          <body>
+            <div id="root"></div>
+            <script type="module" src="/assets/$JS"></script>
+          </body>
+          </html>
+EOF
+
+          echo "Generated $CLIENT_DIR/index.html"
+          ls -la "$CLIENT_DIR/index.html"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy dist --project-name=elpic-actions
+          path: './dist/client'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
