@@ -2,6 +2,14 @@ name: Python Security
 description: Run security scans via mise
 
 inputs:
+  setup:
+    description: Tool setup method (mise, node, just, none)
+    required: false
+    default: mise
+  node-version:
+    description: Node.js version (used when setup=node)
+    required: false
+    default: "20"
   security-task:
     description: mise task for security scans
     required: false
@@ -10,7 +18,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
-    - uses: jdx/mise-action@v2
-    - shell: bash
+    - uses: actions/checkout@v6
+    - if: inputs.setup == 'mise'
+      uses: jdx/mise-action@v2
+    - if: inputs.setup == 'node'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: |
+        curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+    - if: inputs.setup == 'mise'
+      shell: bash
       run: mise run ${{ inputs.security-task }}
+    - if: inputs.setup == 'node'
+      shell: bash
+      run: npm run ${{ inputs.security-task }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: just ${{ inputs.security-task }}

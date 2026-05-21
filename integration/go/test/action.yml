@@ -2,8 +2,16 @@ name: Go Test
 description: Run tests with coverage comparison against the main branch
 
 inputs:
+  setup:
+    description: Tool setup method (mise, node, just, none)
+    required: false
+    default: mise
+  node-version:
+    description: Node.js version (used when setup=node)
+    required: false
+    default: "20"
   test-coverage-task:
-    description: mise task that runs tests and produces coverage.out
+    description: Task that runs tests and produces coverage.out
     required: false
     default: test:coverage
   timeout-minutes:
@@ -14,11 +22,20 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
-    - uses: jdx/mise-action@v2
+    - if: inputs.setup == 'mise'
+      uses: jdx/mise-action@v2
+    - if: inputs.setup == 'node'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: |
+        curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
 
     - name: Download main branch coverage
       id: download-main-coverage
@@ -35,7 +52,12 @@ runs:
 
     - name: Run tests with coverage
       shell: bash
-      run: mise run ${{ inputs.test-coverage-task }}
+      run: |
+        case "${{ inputs.setup }}" in
+          mise) mise run ${{ inputs.test-coverage-task }} ;;
+          node) npm run ${{ inputs.test-coverage-task }} ;;
+          just) just ${{ inputs.test-coverage-task }} ;;
+        esac
       timeout-minutes: ${{ inputs.timeout-minutes }}
 
     - name: Upload coverage artifact

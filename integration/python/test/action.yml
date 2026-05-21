@@ -2,12 +2,20 @@ name: Python Test
 description: Run tests with coverage comparison against the main branch
 
 inputs:
+  setup:
+    description: Tool setup method (mise, node, just, none)
+    required: false
+    default: mise
+  node-version:
+    description: Node.js version (used when setup=node)
+    required: false
+    default: "20"
   test-coverage-task:
-    description: mise task that runs pytest and produces coverage.xml
+    description: Task that runs pytest and produces coverage.xml
     required: false
     default: test:coverage
   test-task:
-    description: mise task that runs tests without coverage
+    description: Task that runs tests without coverage
     required: false
     default: test
   timeout-minutes:
@@ -18,11 +26,20 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
-    - uses: jdx/mise-action@v2
+    - if: inputs.setup == 'mise'
+      uses: jdx/mise-action@v2
+    - if: inputs.setup == 'node'
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+    - if: inputs.setup == 'just'
+      shell: bash
+      run: |
+        curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
 
     - name: Download main branch coverage
       id: download-main-coverage
@@ -45,12 +62,22 @@ runs:
     - name: Run tests without coverage
       if: steps.download-main-coverage.outputs.coverage_available == 'true'
       shell: bash
-      run: mise run ${{ inputs.test-task }}
+      run: |
+        case "${{ inputs.setup }}" in
+          mise) mise run ${{ inputs.test-task }} ;;
+          node) npm run ${{ inputs.test-task }} ;;
+          just) just ${{ inputs.test-task }} ;;
+        esac
 
     - name: Run tests with coverage
       if: steps.download-main-coverage.outputs.coverage_available != 'true'
       shell: bash
-      run: mise run ${{ inputs.test-coverage-task }}
+      run: |
+        case "${{ inputs.setup }}" in
+          mise) mise run ${{ inputs.test-coverage-task }} ;;
+          node) npm run ${{ inputs.test-coverage-task }} ;;
+          just) just ${{ inputs.test-coverage-task }} ;;
+        esac
       timeout-minutes: ${{ inputs.timeout-minutes }}
 
     - name: Upload coverage artifact
