@@ -126,10 +126,22 @@
         "default": "20"
       },
       {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
+      },
+      {
         "name": "integration-task",
-        "description": "mise task for integration tests",
+        "description": "Task for integration tests",
         "required": false,
         "default": "test:integration"
+      },
+      {
+        "name": "env",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "required": false,
+        "default": ""
       }
     ]
   },
@@ -273,9 +285,21 @@
       },
       {
         "name": "integration-task",
-        "description": "mise task for integration tests",
+        "description": "Task for integration tests",
         "required": false,
         "default": "test:integration"
+      },
+      {
+        "name": "env",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
       }
     ]
   },
@@ -381,7 +405,7 @@
     "category": "integration",
     "subcategory": "python",
     "name": "Python Integration Tests",
-    "description": "Run integration tests via mise",
+    "description": "Run integration tests with configurable environment",
     "inputs": [
       {
         "name": "setup",
@@ -397,9 +421,15 @@
       },
       {
         "name": "integration-task",
-        "description": "mise task for integration tests",
+        "description": "Task for integration tests",
         "required": false,
         "default": "test:integration"
+      },
+      {
+        "name": "env",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "required": false,
+        "default": ""
       }
     ]
   },
