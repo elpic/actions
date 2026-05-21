@@ -38,3 +38,4 @@ crash.log
 
 # Misc
 *.log
+.brain/
