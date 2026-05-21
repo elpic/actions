@@ -7,6 +7,7 @@ import {
   actionRepoUrl,
   getAction,
   type ActionDef,
+  type ActionInput,
 } from "@/lib/actions-data";
 
 export const Route = createFileRoute("/actions/$slug")({
@@ -55,11 +56,11 @@ function neighbors(slug: string): { prev?: ActionDef; next?: ActionDef } {
 }
 
 function ActionPage() {
-  const { action } = Route.useLoaderData();
+  const { action } = Route.useLoaderData() as { action: ActionDef };
   const { prev, next } = neighbors(action.slug);
   const ref = `elpic/actions/${action.path}@v1`;
 
-  const exampleInputs = action.inputs.filter((i) => i.required).slice(0, 3);
+  const exampleInputs = action.inputs.filter((i: ActionInput) => i.required).slice(0, 3);
   const usageYaml = [
     "jobs:",
     `  ${action.path.split("/").pop()}:`,
@@ -70,7 +71,7 @@ function ActionPage() {
       ? [
           "        with:",
           ...exampleInputs.map(
-            (i) => `          ${i.name}: ${i.default ?? "<value>"}`,
+            (i: ActionInput) => `          ${i.name}: ${i.default ?? "<value>"}`,
           ),
         ]
       : []),
@@ -165,7 +166,7 @@ function ActionPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {action.inputs.map((input) => (
+                  {action.inputs.map((input: ActionInput) => (
                     <tr key={input.name} className="border-b border-border/60 last:border-0 align-top">
                       <td className="px-4 py-3">
                         <div className="font-mono text-foreground">{input.name}</div>
