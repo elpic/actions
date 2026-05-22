@@ -1576,6 +1576,11 @@ function encodePathParam(value, decoder) {
   const encoded = encodeURIComponent(value);
   return decoder?.(encoded) ?? encoded;
 }
+function notFound(options = {}) {
+  options.isNotFound = true;
+  if (options.throw) throw options;
+  return options;
+}
 function isNotFound(obj) {
   return obj?.isNotFound === true;
 }
@@ -15985,7 +15990,7 @@ function getResponse() {
 }
 var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-owapMLNQ.js");
+  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-DU9cvScB.js");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -16594,8 +16599,8 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./router-BbiCYTtR.js"),
-    import("./start-heY9-4Ch.js"),
+    import("./router-CKv4OAvd.js").then((n2) => n2.r),
+    import("./start-BsV4PJlQ.js"),
     import("./__23tanstack-start-plugin-adapters-Cwee5PKy.js")
   ]);
   return {
@@ -16919,7 +16924,7 @@ const server = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   default: server_default
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  server as $,
+  notFound as $,
   interpolatePath as A,
   nullReplaceEqualDeep as B,
   replaceEqualDeep as C,
@@ -16948,6 +16953,7 @@ export {
   resolveManifestAssetLink as Z,
   Outlet as _,
   arraysEqual as a,
+  server as a0,
   isRedirect as b,
   createLRUCache as c,
   isNotFound as d,

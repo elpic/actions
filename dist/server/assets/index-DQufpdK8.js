@@ -1,108 +1,17 @@
-import { r as reactExports, T as jsxRuntimeExports } from "./server-Dr2tIFaC.js";
+import { T as jsxRuntimeExports } from "./server-DdUa7k2n.js";
+import { A as ACTIONS, L as Link } from "./router-CKv4OAvd.js";
+import { T as Terminal, G as Github, A as ArrowRight, C as Check } from "./terminal-B5O-ER9H.js";
+import { c as createLucideIcon } from "./createLucideIcon-BuqL2Sx9.js";
 import "node:async_hooks";
 import "node:stream/web";
 import "node:stream";
-const mergeClasses = (...classes) => classes.filter((className, index, array) => {
-  return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
-}).join(" ").trim();
-const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-const toCamelCase = (string) => string.replace(
-  /^([A-Z])|[\s-_]+(\w)/g,
-  (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase()
-);
-const toPascalCase = (string) => {
-  const camelCase = toCamelCase(string);
-  return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
-};
-var defaultAttributes = {
-  xmlns: "http://www.w3.org/2000/svg",
-  width: 24,
-  height: 24,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round"
-};
-const hasA11yProp = (props) => {
-  for (const prop in props) {
-    if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
-      return true;
-    }
-  }
-  return false;
-};
-const Icon = reactExports.forwardRef(
-  ({
-    color = "currentColor",
-    size = 24,
-    strokeWidth = 2,
-    absoluteStrokeWidth,
-    className = "",
-    children,
-    iconNode,
-    ...rest
-  }, ref) => reactExports.createElement(
-    "svg",
-    {
-      ref,
-      ...defaultAttributes,
-      width: size,
-      height: size,
-      stroke: color,
-      strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
-      className: mergeClasses("lucide", className),
-      ...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
-      ...rest
-    },
-    [
-      ...iconNode.map(([tag, attrs]) => reactExports.createElement(tag, attrs)),
-      ...Array.isArray(children) ? children : [children]
-    ]
-  )
-);
-const createLucideIcon = (iconName, iconNode) => {
-  const Component = reactExports.forwardRef(
-    ({ className, ...props }, ref) => reactExports.createElement(Icon, {
-      ref,
-      iconNode,
-      className: mergeClasses(
-        `lucide-${toKebabCase(toPascalCase(iconName))}`,
-        `lucide-${iconName}`,
-        className
-      ),
-      ...props
-    })
-  );
-  Component.displayName = toPascalCase(iconName);
-  return Component;
-};
-const __iconNode$b = [
-  ["path", { d: "M5 12h14", key: "1ays0h" }],
-  ["path", { d: "m12 5 7 7-7 7", key: "xquz4c" }]
-];
-const ArrowRight = createLucideIcon("arrow-right", __iconNode$b);
-const __iconNode$a = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", __iconNode$a);
-const __iconNode$9 = [
+const __iconNode$7 = [
   ["path", { d: "M15 6a9 9 0 0 0-9 9V3", key: "1cii5b" }],
   ["circle", { cx: "18", cy: "6", r: "3", key: "1h7g24" }],
   ["circle", { cx: "6", cy: "18", r: "3", key: "fqmcym" }]
 ];
-const GitBranch = createLucideIcon("git-branch", __iconNode$9);
-const __iconNode$8 = [
-  [
-    "path",
-    {
-      d: "M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4",
-      key: "tonef"
-    }
-  ],
-  ["path", { d: "M9 18c-4.51 2-5-2-7-2", key: "9comsn" }]
-];
-const Github = createLucideIcon("github", __iconNode$8);
-const __iconNode$7 = [
+const GitBranch = createLucideIcon("git-branch", __iconNode$7);
+const __iconNode$6 = [
   [
     "path",
     {
@@ -125,8 +34,8 @@ const __iconNode$7 = [
     }
   ]
 ];
-const Layers = createLucideIcon("layers", __iconNode$7);
-const __iconNode$6 = [
+const Layers = createLucideIcon("layers", __iconNode$6);
+const __iconNode$5 = [
   [
     "path",
     {
@@ -138,8 +47,8 @@ const __iconNode$6 = [
   ["polyline", { points: "3.29 7 12 12 20.71 7", key: "ousv84" }],
   ["path", { d: "m7.5 4.27 9 5.15", key: "1c824w" }]
 ];
-const Package = createLucideIcon("package", __iconNode$6);
-const __iconNode$5 = [
+const Package = createLucideIcon("package", __iconNode$5);
+const __iconNode$4 = [
   [
     "path",
     {
@@ -148,8 +57,8 @@ const __iconNode$5 = [
     }
   ]
 ];
-const Shield = createLucideIcon("shield", __iconNode$5);
-const __iconNode$4 = [
+const Shield = createLucideIcon("shield", __iconNode$4);
+const __iconNode$3 = [
   [
     "path",
     {
@@ -159,12 +68,7 @@ const __iconNode$4 = [
   ],
   ["circle", { cx: "7.5", cy: "7.5", r: ".5", fill: "currentColor", key: "kqv944" }]
 ];
-const Tag = createLucideIcon("tag", __iconNode$4);
-const __iconNode$3 = [
-  ["path", { d: "M12 19h8", key: "baeox8" }],
-  ["path", { d: "m4 17 6-6-6-6", key: "1yngyt" }]
-];
-const Terminal = createLucideIcon("terminal", __iconNode$3);
+const Tag = createLucideIcon("tag", __iconNode$3);
 const __iconNode$2 = [
   ["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2", key: "by2w9f" }],
   ["path", { d: "M7 11v4a2 2 0 0 0 2 2h4", key: "xkn7yn" }],
@@ -192,31 +96,34 @@ const __iconNode = [
 ];
 const Zap = createLucideIcon("zap", __iconNode);
 const REPO = "https://github.com/elpic/actions";
-const categories = [{
-  name: "integration",
-  icon: Workflow,
-  blurb: "PR integration: test, lint, build, security",
-  items: ["go/test", "go/lint", "go/build", "go/integration-tests", "go/security", "python/test", "python/lint", "python/integration-tests", "python/security"],
-  accent: "primary"
-}, {
-  name: "delivery",
-  icon: Package,
-  blurb: "Release and publish to registries",
-  items: ["pypi/build", "pypi/publish"],
-  accent: "accent"
-}, {
-  name: "github",
-  icon: Github,
-  blurb: "GitHub-specific composite actions",
-  items: ["blueprint-check"],
-  accent: "primary"
-}, {
-  name: "utilities",
-  icon: Wrench,
-  blurb: "General-purpose composite actions",
-  items: ["setup-mise", "update-major-tag", "upsert-pr-comment"],
-  accent: "accent"
-}];
+const categoryMeta = {
+  integration: {
+    icon: Workflow,
+    blurb: "PR integration: test, lint, build, security"
+  },
+  delivery: {
+    icon: Package,
+    blurb: "Release and publish to registries"
+  },
+  github: {
+    icon: Github,
+    blurb: "GitHub-specific composite actions"
+  },
+  utilities: {
+    icon: Wrench,
+    blurb: "General-purpose composite actions"
+  }
+};
+const categoryOrder = ["integration", "delivery", "github", "utilities"];
+const categories = categoryOrder.map((name) => {
+  const items = ACTIONS.filter((a) => a.category === name);
+  return {
+    name,
+    icon: categoryMeta[name].icon,
+    blurb: categoryMeta[name].blurb,
+    items
+  };
+});
 const features = [{
   icon: Layers,
   title: "Composite by design",
@@ -246,7 +153,8 @@ function Landing() {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "hidden items-center gap-7 text-sm text-muted-foreground md:flex", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#categories", className: "transition-colors hover:text-foreground", children: "Categories" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#usage", className: "transition-colors hover:text-foreground", children: "Usage" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#versioning", className: "transition-colors hover:text-foreground", children: "Versioning" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#versioning", className: "transition-colors hover:text-foreground", children: "Versioning" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "#templates", className: "transition-colors hover:text-foreground", children: "Templates" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: REPO, target: "_blank", rel: "noreferrer", className: "inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Github, { className: "h-4 w-4" }),
@@ -259,7 +167,7 @@ function Landing() {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative mx-auto max-w-6xl px-6 pt-24 pb-20 sm:pt-32 sm:pb-28", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto max-w-3xl text-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-1.5 w-1.5 animate-pulse rounded-full bg-primary" }),
-          "v1.0.1 - released today"
+          "v1.4.0 - released today"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl", children: [
           "Reusable GitHub Actions,",
@@ -297,7 +205,10 @@ function Landing() {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-12 flex items-end justify-between gap-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-mono text-xs uppercase tracking-widest text-primary", children: "/ categories" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-2 text-3xl font-semibold tracking-tight sm:text-4xl", children: "Eleven actions, organized by intent." })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "mt-2 text-3xl font-semibold tracking-tight sm:text-4xl", children: [
+            ACTIONS.length,
+            " actions, organized by intent."
+          ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: `${REPO}#categories`, target: "_blank", rel: "noreferrer", className: "hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex sm:items-center sm:gap-1", children: [
           "View all ",
@@ -318,7 +229,12 @@ function Landing() {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "rounded-full border border-border bg-secondary/60 px-2.5 py-1 font-mono text-xs text-muted-foreground", children: cat.items.length })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-5 flex flex-wrap gap-2", children: cat.items.map((it) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { className: "rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90", children: it }, it)) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-5 flex flex-wrap gap-2", children: cat.items.map((it) => {
+          const label = it.subcategory ? `${it.subcategory}/${it.path.split("/").pop()}` : it.path.split("/").pop();
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Link, { to: "/actions/$slug", params: {
+            slug: it.slug
+          }, className: "inline-block rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary", children: label }) }, it.slug);
+        }) })
       ] }, cat.name)) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("section", { id: "usage", className: "border-t border-border/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mx-auto max-w-6xl px-6 py-20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid items-start gap-10 lg:grid-cols-2", children: [
@@ -372,6 +288,18 @@ function Landing() {
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-muted-foreground", children: v.desc })
       ] }, v.tag)) })
     ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("section", { id: "templates", className: "border-t border-border/60", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mx-auto max-w-6xl px-6 py-20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 transition-colors hover:border-primary/40", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 font-mono text-xs text-muted-foreground", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "h-1.5 w-1.5 rounded-full bg-primary" }),
+        "sibling project"
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "mt-5 text-2xl font-semibold tracking-tight", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono", children: "elpic/templates" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-3 text-muted-foreground", children: "Blueprint-rendered templates for Dockerfiles and GitHub Actions workflows. Declare versions once, render every file, and detect drift automatically in CI." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("a", { href: "https://elpic.github.io/templates/", target: "_blank", rel: "noreferrer", className: "mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:glow-primary", children: [
+        "Visit elpic/templates",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "h-4 w-4" })
+      ] })
+    ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "border-t border-border/60", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mx-auto max-w-4xl px-6 py-24 text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-balance text-3xl font-semibold tracking-tight sm:text-4xl", children: "Ship pipelines, not boilerplate." }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mx-auto mt-4 max-w-xl text-muted-foreground", children: [
