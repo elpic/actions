@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/elpic/actions/compare/v1.3.0...v1.4.0) (2026-05-22)
+
+
+### Features
+
+* extract just installation into utilities/setup-just ([37fca26](https://github.com/elpic/actions/commit/37fca264c3f0a0ac0472cdbfe6b59549c110c9eb))
+
 ## [1.3.0](https://github.com/elpic/actions/compare/v1.2.0...v1.3.0) (2026-05-22)
 
 
