@@ -1,0 +1,11 @@
+name: Setup Just
+description: Install the just command runner (https://just.systems)
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        if ! command -v just &>/dev/null; then
+          curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+        fi
