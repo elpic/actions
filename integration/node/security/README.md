@@ -42,7 +42,7 @@ jobs:
 
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `setup` | no | `mise` | Tool setup method -- `mise`, `node`, `just`, or `none` |
+| `setup` | no | `bash` | Tool setup method -- `bash`, `mise`, `node`, `just`, or `none` |
 | `node-version` | no | `20` | Node.js version (used when `setup=node`) |
 | `security-task` | no | `security` | Task to run |
 

@@ -3,9 +3,9 @@ description: Download the built artifact and run integration tests
 
 inputs:
   setup:
-    description: Tool setup method (mise, node, just, none)
+    description: Tool setup method (bash, mise, node, just, none)
     required: false
-    default: mise
+    default: bash
   node-version:
     description: Node.js version (used when setup=node)
     required: false
@@ -14,7 +14,7 @@ inputs:
     description: Application name; used in artifact names
     required: true
   integration-task:
-    description: Task for integration tests
+    description: Task to run
     required: false
     default: test:integration
   env:
@@ -55,6 +55,7 @@ runs:
       run: |
         chmod +x ${{ inputs.app-name }}-*
         case "${{ inputs.setup }}" in
+          bash|*) ${{ inputs.integration-task }} ;;
           mise) mise run ${{ inputs.integration-task }} ;;
           node) npm run ${{ inputs.integration-task }} ;;
           just) just ${{ inputs.integration-task }} ;;

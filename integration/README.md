@@ -200,9 +200,16 @@ jobs:
       - uses: elpic/actions/integration/node/security@v1
 ```
 
-## Using setup-node instead of mise
+## Using setup-node or bash
 
 ```yaml
+# Run a raw bash command
+- uses: elpic/actions/integration/go/test@v1
+  with:
+    setup: bash
+    test-coverage-task: go test ./... -coverprofile=coverage.out
+
+# Use Node.js tooling
 - uses: elpic/actions/integration/node/lint@v1
   with:
     setup: node

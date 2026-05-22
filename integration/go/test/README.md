@@ -6,7 +6,7 @@ Downloads the main branch's coverage artifact, runs the current PR's tests, calc
 
 ## Usage
 
-### Default (mise)
+### Default (bash)
 
 ```yaml
 name: Integration
@@ -49,7 +49,7 @@ jobs:
 
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `setup` | no | `mise` | Tool setup method -- `mise`, `node`, `just`, or `none` |
+| `setup` | no | `bash` | Tool setup method -- `bash`, `mise`, `node`, `just`, or `none` |
 | `node-version` | no | `20` | Node.js version (used when `setup=node`) |
 | `test-coverage-task` | no | `test:coverage` | Task that runs tests with coverage (produces `coverage.out`) |
 | `timeout-minutes` | no | `8` | Step timeout |

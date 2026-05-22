@@ -3,15 +3,15 @@ description: Run integration tests with configurable environment
 
 inputs:
   setup:
-    description: Tool setup method (mise, node, just, none)
+    description: Tool setup method (bash, mise, node, just, none)
     required: false
-    default: mise
+    default: bash
   node-version:
     description: Node.js version (used when setup=node)
     required: false
     default: "20"
   integration-task:
-    description: Task for integration tests
+    description: Task to run
     required: false
     default: test:integration
   env:
@@ -45,6 +45,9 @@ runs:
             echo "$line" >> "$GITHUB_ENV"
           fi
         done
+    - if: inputs.setup == 'bash' || inputs.setup == ''
+      shell: bash
+      run: ${{ inputs.integration-task }}
     - if: inputs.setup == 'mise'
       shell: bash
       run: mise run ${{ inputs.integration-task }}
