@@ -1,4 +1,4 @@
-# delivery/python/build
+# Python Build
 
 Build a Python package wheel and upload it as an artifact for the `publish` action.
 

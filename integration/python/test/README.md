@@ -1,4 +1,4 @@
-# integration/python/test
+# Python Test
 
 Run tests with coverage comparison against the main branch.
 

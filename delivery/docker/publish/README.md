@@ -1,4 +1,4 @@
-# delivery/docker/publish
+# Docker Publish
 
 Build, tag, and push a Docker image to a container registry.
 

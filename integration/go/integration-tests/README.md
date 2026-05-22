@@ -1,4 +1,4 @@
-# integration/go/integration-tests
+# Go Integration Tests
 
 Download the built Go binary and run integration tests with services.
 

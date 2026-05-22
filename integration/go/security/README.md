@@ -1,4 +1,4 @@
-# integration/go/security
+# Go Security
 
 Run Go security scans via mise.
 

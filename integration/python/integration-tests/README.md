@@ -1,4 +1,4 @@
-# integration/python/integration-tests
+# Python Integration Tests
 
 Run Python integration tests with services.
 

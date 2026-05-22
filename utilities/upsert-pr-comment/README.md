@@ -1,4 +1,4 @@
-# utilities/upsert-pr-comment
+# Upsert PR Comment
 
 Post, update, or delete a PR comment matched by prefix.
 

@@ -1,4 +1,4 @@
-# delivery/python/publish
+# Python Publish
 
 Publish a built Python package to PyPI, GitHub Packages, or JFrog Artifactory.
 

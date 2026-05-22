@@ -1,4 +1,4 @@
-# integration/node/test
+# Node.js Test
 
 Run tests with coverage comparison against the main branch.
 

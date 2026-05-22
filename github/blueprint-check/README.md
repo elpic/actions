@@ -1,4 +1,4 @@
-# github/blueprint-check
+# Blueprint Check
 
 Run `blueprint check` on a PR. Posts a drift comment when detected, removes it when resolved.
 

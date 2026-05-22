@@ -1,4 +1,4 @@
-# delivery
+# Delivery
 
 Composite actions for release and publishing workflows.
 

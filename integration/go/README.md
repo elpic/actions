@@ -1,4 +1,4 @@
-# integration/go
+# Go
 
 Composite actions for Go CI — test, lint, build, integration tests, and security.
 

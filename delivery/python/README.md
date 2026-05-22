@@ -1,4 +1,4 @@
-# delivery/python
+# Python
 
 Composite actions for releasing Python packages to PyPI, GitHub Packages, or JFrog Artifactory.
 

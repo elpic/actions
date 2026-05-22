@@ -1,4 +1,4 @@
-# delivery/pages/publish
+# Pages Publish
 
 Build a static site and deploy it to GitHub Pages.
 

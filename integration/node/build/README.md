@@ -1,4 +1,4 @@
-# integration/node/build
+# Node.js Build
 
 Build the Node.js project and upload it as an artifact.
 

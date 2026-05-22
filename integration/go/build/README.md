@@ -1,4 +1,4 @@
-# integration/go/build
+# Go Build
 
 Build the Go binary and upload it as an artifact.
 

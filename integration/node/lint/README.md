@@ -1,4 +1,4 @@
-# integration/node/lint
+# Node.js Lint
 
 Run the Node.js linter (ESLint + Prettier) via mise.
 
