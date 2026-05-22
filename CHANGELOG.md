@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/elpic/actions/compare/v1.1.0...v1.2.0) (2026-05-22)
+
+
+### Features
+
+* extend delivery/python/publish with registry input (pypi, github, jfrog) ([a0be7c6](https://github.com/elpic/actions/commit/a0be7c69ea20316f3297733477cf2508d86394ff))
+
 ## [1.1.0](https://github.com/elpic/actions/compare/v1.0.0...v1.1.0) (2026-05-21)
 
 
