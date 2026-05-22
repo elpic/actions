@@ -1,0 +1,34 @@
+name: GitHub Release Build
+description: Build the application and upload as artifact for release
+
+inputs:
+  app-name:
+    description: Application name; used in artifact names
+    required: true
+  build-task:
+    description: mise task that builds the application
+    required: false
+    default: build
+  build-output:
+    description: Directory containing the built output
+    required: false
+    default: dist
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - uses: jdx/mise-action@v2
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci || true  # non-Node projects skip this
+
+    - shell: bash
+      run: mise run ${{ inputs.build-task }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-dist
+        path: ${{ inputs.build-output }}
