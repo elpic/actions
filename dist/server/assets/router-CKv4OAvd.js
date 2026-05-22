@@ -1,7 +1,4 @@
-import { r as reactExports, f as functionalUpdate$1, a as arraysEqual, c as createLRUCache, i as isPromise, b as isRedirect, d as isNotFound, e as invariant, g as createControlledPromise, h as rootRouteId, j as isServer$1, k as compileDecodeCharMap, t as trimPath, l as rewriteBasepath, m as composeRewrites, p as processRouteTree, n as processRouteMasks, o as resolvePath, q as cleanPath, s as trimPathRight, u as parseHref, v as executeRewriteInput, w as isDangerousProtocol, x as redirect, y as findSingleMatch, z as deepEqual, D as DEFAULT_PROTOCOL_ALLOWLIST, A as interpolatePath, B as nullReplaceEqualDeep, C as replaceEqualDeep$1, E as last, F as decodePath, G as findFlatMatch, H as findRouteMatch, I as executeRewriteOutput, J as encodePathLikeUrl, K as trimPathLeft, L as joinPaths, M as useRouter, N as dummyMatchContext, O as matchContext, P as requireReactDom, Q as exactPathTest, R as removeTrailingSlash, S as React, T as jsxRuntimeExports, U as isModuleNotFoundError, V as useHydrated, W as escapeHtml, X as isInlinableStylesheet, Y as getAssetCrossOrigin, Z as resolveManifestAssetLink, _ as Outlet } from "./server-Dr2tIFaC.js";
-import "node:async_hooks";
-import "node:stream/web";
-import "node:stream";
+import { r as reactExports, f as functionalUpdate$1, a as arraysEqual, c as createLRUCache, i as isPromise, b as isRedirect, d as isNotFound, e as invariant, g as createControlledPromise, h as rootRouteId, j as isServer$1, k as compileDecodeCharMap, t as trimPath, l as rewriteBasepath, m as composeRewrites, p as processRouteTree, n as processRouteMasks, o as resolvePath, q as cleanPath, s as trimPathRight, u as parseHref, v as executeRewriteInput, w as isDangerousProtocol, x as redirect, y as findSingleMatch, z as deepEqual, D as DEFAULT_PROTOCOL_ALLOWLIST, A as interpolatePath, B as nullReplaceEqualDeep, C as replaceEqualDeep$1, E as last, F as decodePath, G as findFlatMatch, H as findRouteMatch, I as executeRewriteOutput, J as encodePathLikeUrl, K as trimPathLeft, L as joinPaths, M as useRouter, N as dummyMatchContext, O as matchContext, P as requireReactDom, Q as exactPathTest, R as removeTrailingSlash, S as React, T as jsxRuntimeExports, U as isModuleNotFoundError, V as useHydrated, W as escapeHtml, X as isInlinableStylesheet, Y as getAssetCrossOrigin, Z as resolveManifestAssetLink, _ as Outlet, $ as notFound } from "./server-DdUa7k2n.js";
 var reactUse = reactExports.use;
 function useForwardedRef(ref) {
   const innerRef = reactExports.useRef(null);
@@ -1299,7 +1296,7 @@ var RouterCore = class {
     };
     this.load = async (opts) => {
       let redirect2;
-      let notFound;
+      let notFound2;
       let loadPromise;
       const previousLocation = this.stores.resolvedLocation.get() ?? this.stores.location.get();
       loadPromise = new Promise((resolve) => {
@@ -1366,8 +1363,8 @@ var RouterCore = class {
           } catch (err) {
             if (isRedirect(err)) {
               redirect2 = err;
-            } else if (isNotFound(err)) notFound = err;
-            const nextStatusCode = redirect2 ? redirect2.status : notFound ? 404 : this.stores.matches.get().some((d) => d.status === "error") ? 500 : 200;
+            } else if (isNotFound(err)) notFound2 = err;
+            const nextStatusCode = redirect2 ? redirect2.status : notFound2 ? 404 : this.stores.matches.get().some((d) => d.status === "error") ? 500 : 200;
             this.batch(() => {
               this.stores.statusCode.set(nextStatusCode);
               this.stores.redirect.set(redirect2);
@@ -1978,10 +1975,10 @@ var BaseRootRoute = class extends BaseRoute {
   }
 };
 function useMatch(opts) {
-  const router = useRouter();
+  const router2 = useRouter();
   const nearestMatchId = reactExports.useContext(opts.from ? dummyMatchContext : matchContext);
   const key = opts.from ?? nearestMatchId;
-  const matchStore = key ? opts.from ? router.stores.getRouteMatchStore(key) : router.stores.matchStores.get(key) : void 0;
+  const matchStore = key ? opts.from ? router2.stores.getRouteMatchStore(key) : router2.stores.matchStores.get(key) : void 0;
   {
     const match = matchStore?.get();
     if ((opts.shouldThrow ?? true) && !match) {
@@ -2034,13 +2031,13 @@ function useSearch(opts) {
   });
 }
 function useNavigate(_defaultOpts) {
-  const router = useRouter();
+  const router2 = useRouter();
   return reactExports.useCallback((options) => {
-    return router.navigate({
+    return router2.navigate({
       ...options,
       from: options.from ?? _defaultOpts?.from
     });
-  }, [_defaultOpts?.from, router]);
+  }, [_defaultOpts?.from, router2]);
 }
 function useRouteContext(opts) {
   return useMatch({
@@ -2050,14 +2047,14 @@ function useRouteContext(opts) {
 }
 requireReactDom();
 function useLinkProps(options, forwardedRef) {
-  const router = useRouter();
+  const router2 = useRouter();
   const innerRef = useForwardedRef(forwardedRef);
   const { activeProps, inactiveProps, activeOptions, to, preload: userPreload, preloadDelay: userPreloadDelay, preloadIntentProximity: _preloadIntentProximity, hashScrollIntoView, replace, startTransition, resetScroll, viewTransition, children, target, disabled, style, className, onClick, onBlur, onFocus, onMouseEnter, onMouseLeave, onTouchStart, ignoreBlocker, params: _params, search: _search, hash: _hash, state: _state, mask: _mask, reloadDocument: _reloadDocument, unsafeRelative: _unsafeRelative, from: _from, _fromLocation, ...propsSafeToSpread } = options;
   {
     const safeInternal = isSafeInternal(to);
     if (typeof to === "string" && !safeInternal && to.indexOf(":") > -1) try {
       new URL(to);
-      if (isDangerousProtocol(to, router.protocolAllowlist)) {
+      if (isDangerousProtocol(to, router2.protocolAllowlist)) {
         if (false) ;
         return {
           ...propsSafeToSpread,
@@ -2082,14 +2079,14 @@ function useLinkProps(options, forwardedRef) {
       };
     } catch {
     }
-    const next2 = router.buildLocation({
+    const next2 = router2.buildLocation({
       ...options,
       from: options.from
     });
-    const hrefOption2 = getHrefOption(next2.maskedLocation ? next2.maskedLocation.publicHref : next2.publicHref, next2.maskedLocation ? next2.maskedLocation.external : next2.external, router.history, disabled);
+    const hrefOption2 = getHrefOption(next2.maskedLocation ? next2.maskedLocation.publicHref : next2.publicHref, next2.maskedLocation ? next2.maskedLocation.external : next2.external, router2.history, disabled);
     const externalLink2 = (() => {
       if (hrefOption2?.external) {
-        if (isDangerousProtocol(hrefOption2.href, router.protocolAllowlist)) {
+        if (isDangerousProtocol(hrefOption2.href, router2.protocolAllowlist)) {
           return;
         }
         return hrefOption2.href;
@@ -2097,7 +2094,7 @@ function useLinkProps(options, forwardedRef) {
       if (safeInternal) return void 0;
       if (typeof to === "string" && to.indexOf(":") > -1) try {
         new URL(to);
-        if (isDangerousProtocol(to, router.protocolAllowlist)) {
+        if (isDangerousProtocol(to, router2.protocolAllowlist)) {
           if (false) ;
           return;
         }
@@ -2107,13 +2104,13 @@ function useLinkProps(options, forwardedRef) {
     })();
     const isActive2 = (() => {
       if (externalLink2) return false;
-      const currentLocation2 = router.stores.location.get();
+      const currentLocation2 = router2.stores.location.get();
       const exact = activeOptions?.exact ?? false;
       if (exact) {
-        if (!exactPathTest(currentLocation2.pathname, next2.pathname, router.basepath)) return false;
+        if (!exactPathTest(currentLocation2.pathname, next2.pathname, router2.basepath)) return false;
       } else {
-        const currentPathSplit = removeTrailingSlash(currentLocation2.pathname, router.basepath);
-        const nextPathSplit = removeTrailingSlash(next2.pathname, router.basepath);
+        const currentPathSplit = removeTrailingSlash(currentLocation2.pathname, router2.basepath);
+        const nextPathSplit = removeTrailingSlash(next2.pathname, router2.basepath);
         if (!(currentPathSplit.startsWith(nextPathSplit) && (currentPathSplit.length === nextPathSplit.length || currentPathSplit[nextPathSplit.length] === "/"))) return false;
       }
       if (activeOptions?.includeSearch ?? true) {
@@ -2220,7 +2217,7 @@ var Link = reactExports.forwardRef((props, ref) => {
   }
   return reactExports.createElement(_asChild, linkProps, children);
 });
-var Route$2 = class Route extends BaseRoute {
+var Route$4 = class Route extends BaseRoute {
   /**
   * @deprecated Use the `createRoute` function instead.
   */
@@ -2278,7 +2275,7 @@ var Route$2 = class Route extends BaseRoute {
   }
 };
 function createRoute(options) {
-  return new Route$2(options);
+  return new Route$4(options);
 }
 function createRootRouteWithContext() {
   return (options) => {
@@ -2367,7 +2364,7 @@ function lazyRouteComponent(importer, exportName) {
   const load = () => {
     if (!loadPromise) loadPromise = importer().then((res) => {
       loadPromise = void 0;
-      comp = res[exportName];
+      comp = res[exportName ?? "default"];
     }).catch((err) => {
       error = err;
       if (isModuleNotFoundError(error)) {
@@ -2508,7 +2505,7 @@ function Script({ attrs, children }) {
     return null;
   }
 }
-function buildTagsFromMatches(router, nonce, matches, assetCrossOrigin) {
+function buildTagsFromMatches(router2, nonce, matches, assetCrossOrigin) {
   const routeMeta = matches.map((match) => match.meta).filter(Boolean);
   const resultMeta = [];
   const metaByAttribute = {};
@@ -2562,7 +2559,7 @@ function buildTagsFromMatches(router, nonce, matches, assetCrossOrigin) {
       nonce
     }
   }));
-  const manifest = router.ssr?.manifest;
+  const manifest = router2.ssr?.manifest;
   const assetLinks = matches.map((match) => manifest?.routes[match.routeId]?.assets ?? []).filter(Boolean).flat(1).flatMap((asset) => {
     if (asset.tag === "link") {
       if (isInlinableStylesheet(manifest, asset)) return [];
@@ -2588,7 +2585,7 @@ function buildTagsFromMatches(router, nonce, matches, assetCrossOrigin) {
     return [];
   });
   const preloadLinks = [];
-  matches.map((match) => router.looseRoutesById[match.routeId]).forEach((route) => router.ssr?.manifest?.routes[route.id]?.preloads?.filter(Boolean).forEach((preload) => {
+  matches.map((match) => router2.looseRoutesById[match.routeId]).forEach((route) => router2.ssr?.manifest?.routes[route.id]?.preloads?.filter(Boolean).forEach((preload) => {
     const preloadLink = resolveManifestAssetLink(preload);
     preloadLinks.push({
       tag: "link",
@@ -2626,9 +2623,9 @@ function buildTagsFromMatches(router, nonce, matches, assetCrossOrigin) {
   ], (d) => JSON.stringify(d));
 }
 var useTags = (assetCrossOrigin) => {
-  const router = useRouter();
-  const nonce = router.options.ssr?.nonce;
-  return buildTagsFromMatches(router, nonce, router.stores.matches.get(), assetCrossOrigin);
+  const router2 = useRouter();
+  const nonce = router2.options.ssr?.nonce;
+  return buildTagsFromMatches(router2, nonce, router2.stores.matches.get(), assetCrossOrigin);
 };
 function uniqBy(arr, fn) {
   const seen = /* @__PURE__ */ new Set();
@@ -2649,13 +2646,13 @@ function HeadContent(props) {
   })) });
 }
 var Scripts = () => {
-  const router = useRouter();
-  const nonce = router.options.ssr?.nonce;
+  const router2 = useRouter();
+  const nonce = router2.options.ssr?.nonce;
   const getAssetScripts = (matches) => {
     const assetScripts = [];
-    const manifest = router.ssr?.manifest;
+    const manifest = router2.ssr?.manifest;
     if (!manifest) return [];
-    matches.map((match) => router.looseRoutesById[match.routeId]).forEach((route) => manifest.routes[route.id]?.assets?.filter((d) => d.tag === "script").forEach((asset) => {
+    matches.map((match) => router2.looseRoutesById[match.routeId]).forEach((route) => manifest.routes[route.id]?.assets?.filter((d) => d.tag === "script").forEach((asset) => {
       assetScripts.push({
         tag: "script",
         attrs: {
@@ -2677,14 +2674,14 @@ var Scripts = () => {
     children
   }));
   {
-    const activeMatches = router.stores.matches.get();
+    const activeMatches = router2.stores.matches.get();
     const assetScripts = getAssetScripts(activeMatches);
-    return renderScripts(router, getScripts(activeMatches), assetScripts);
+    return renderScripts(router2, getScripts(activeMatches), assetScripts);
   }
 };
-function renderScripts(router, scripts, assetScripts) {
+function renderScripts(router2, scripts, assetScripts) {
   let serverBufferedScript = void 0;
-  if (router.serverSsr) serverBufferedScript = router.serverSsr.takeBufferedScripts();
+  if (router2.serverSsr) serverBufferedScript = router2.serverSsr.takeBufferedScripts();
   const allScripts = [...scripts, ...assetScripts];
   if (serverBufferedScript) allScripts.unshift(serverBufferedScript);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: allScripts.map((asset, i) => /* @__PURE__ */ reactExports.createElement(Asset, {
@@ -4641,7 +4638,7 @@ var QueryClientProvider = ({
   }, [client]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientContext.Provider, { value: client, children });
 };
-const appCss = "/assets/styles-DWr-NmBC.css";
+const appCss = "/assets/styles-B4py0EE5.css";
 function NotFoundComponent() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-md text-center", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-7xl font-bold text-foreground", children: "404" }),
@@ -4659,7 +4656,7 @@ function NotFoundComponent() {
 }
 function ErrorComponent({ error, reset }) {
   console.error(error);
-  const router = useRouter();
+  const router2 = useRouter();
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex min-h-screen items-center justify-center bg-background px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-md text-center", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-xl font-semibold tracking-tight text-foreground", children: "This page didn't load" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-sm text-muted-foreground", children: "Something went wrong on our end. You can try refreshing or head back home." }),
@@ -4668,7 +4665,7 @@ function ErrorComponent({ error, reset }) {
         "button",
         {
           onClick: () => {
-            router.invalidate();
+            router2.invalidate();
             reset();
           },
           className: "inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
@@ -4686,24 +4683,33 @@ function ErrorComponent({ error, reset }) {
     ] })
   ] }) });
 }
-const Route$1 = createRootRouteWithContext()({
+const Route$3 = createRootRouteWithContext()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { name: "author", content: "elpic" },
+      { name: "robots", content: "index, follow" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" }
+      { property: "og:site_name", content: "elpic/actions" },
+      { name: "twitter:card", content: "summary_large_image" }
     ],
     links: [
+      { rel: "stylesheet", href: appCss }
+    ],
+    scripts: [
       {
-        rel: "stylesheet",
-        href: appCss
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          name: "elpic/actions",
+          description: "Composite GitHub Actions for integration, delivery, and repo automation.",
+          codeRepository: "https://github.com/elpic/actions",
+          programmingLanguage: ["YAML", "Go", "Python"],
+          license: "https://opensource.org/licenses/MIT",
+          author: { "@type": "Organization", name: "elpic" }
+        })
       }
     ]
   }),
@@ -4722,14 +4728,58 @@ function RootShell({ children }) {
   ] });
 }
 function RootComponent() {
-  const { queryClient } = Route$1.useRouteContext();
+  const { queryClient } = Route$3.useRouteContext();
   return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Outlet, {}) });
 }
-const $$splitComponentImporter = () => import("./index-D9jpX4dP.js");
-const Route2 = createFileRoute("/")({
+const raw = /* @__PURE__ */ JSON.parse('[{"slug":"delivery-docker-publish","path":"delivery/docker/publish","category":"delivery","subcategory":"docker","name":"Docker Publish","description":"Build, tag, and push a Docker image to a container registry","inputs":[{"name":"app-name","description":"Application name; used in image tags","required":true,"default":null},{"name":"registry","description":"Container registry URL (e.g. ghcr.io, docker.io, aws_account_id.dkr.ecr.region.amazonaws.com)","required":true,"default":null},{"name":"dockerfile","description":"Path to the Dockerfile","required":false,"default":"Dockerfile"},{"name":"build-context","description":"Docker build context directory","required":false,"default":"."},{"name":"build-task","description":"mise task for pre-build steps (optional)","required":false,"default":""},{"name":"additional-tags","description":"Comma-separated list of additional tags to apply","required":false,"default":""}]},{"slug":"delivery-github-release-build","path":"delivery/github-release/build","category":"delivery","subcategory":"github-release","name":"GitHub Release Build","description":"Build the application and upload as artifact for release","inputs":[{"name":"app-name","description":"Application name; used in artifact names","required":true,"default":null},{"name":"build-task","description":"mise task that builds the application","required":false,"default":"build"},{"name":"build-output","description":"Directory containing the built output","required":false,"default":"dist"}]},{"slug":"delivery-github-release-publish","path":"delivery/github-release/publish","category":"delivery","subcategory":"github-release","name":"GitHub Release Publish","description":"Download the build artifact and create a GitHub Release","inputs":[{"name":"app-name","description":"Application name; used to download the correct artifact","required":true,"default":null},{"name":"build-output","description":"Directory where the built artifact was extracted","required":false,"default":"dist"}]},{"slug":"delivery-pages-publish","path":"delivery/pages/publish","category":"delivery","subcategory":"pages","name":"GitHub Pages Publish","description":"Build a static site and deploy it to GitHub Pages","inputs":[{"name":"build-command","description":"Command to build the static site (e.g. bun run build, npm run build, make build)","required":true,"default":null},{"name":"output-directory","description":"Directory containing the built static files (relative to repo root)","required":false,"default":"dist"},{"name":"setup-command","description":"Optional command to run before the build (e.g. npm ci, bun install, pip install -r requirements.txt)","required":false,"default":""},{"name":"base-path","description":"Base path for the site. For user/org sites (username.github.io) this is empty. For project sites (username.github.io/repo) this is /repo. Leave empty to let the action derive it from the repository name.","required":false,"default":""}]},{"slug":"delivery-python-build","path":"delivery/python/build","category":"delivery","subcategory":"python","name":"PyPI Build","description":"Build a Python package wheel and upload it as an artifact","inputs":[{"name":"app-name","description":"Application name; used in artifact names","required":true,"default":null},{"name":"pypi-package-dir","description":"Directory containing built artifacts (relative to repo root)","required":false,"default":"dist"},{"name":"build-task","description":"mise task that builds the package wheel","required":false,"default":"build"}]},{"slug":"delivery-python-publish","path":"delivery/python/publish","category":"delivery","subcategory":"python","name":"Python Publish","description":"Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory.","inputs":[{"name":"app-name","description":"Application name; used in artifact names","required":true,"default":null},{"name":"registry","description":"Target registry (pypi, github, jfrog)","required":false,"default":"pypi"},{"name":"packages-dir","description":"Directory containing built artifacts","required":false,"default":"dist"},{"name":"jfrog-url","description":"JFrog Artifactory PyPI repository URL (required when registry=jfrog)","required":false,"default":""},{"name":"jfrog-user","description":"JFrog username (required when registry=jfrog)","required":false,"default":""},{"name":"jfrog-token","description":"JFrog API token or password (required when registry=jfrog)","required":false,"default":""}]},{"slug":"github-blueprint-check","path":"github/blueprint-check","category":"github","subcategory":null,"name":"Blueprint Drift Check","description":"Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.","inputs":[{"name":"blueprint-file","description":"Path to the .bp file inside the repo (e.g. setup.bp)","required":true,"default":null},{"name":"template","description":"Template path or @github shorthand (e.g. @github:elpic/templates@main:containers/python)","required":true,"default":null},{"name":"against","description":"Directory or file to check against (e.g. . or src/)","required":true,"default":null}]},{"slug":"integration-go-build","path":"integration/go/build","category":"integration","subcategory":"go","name":"Go Build","description":"Build the Go binary and upload it as an artifact","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"build-task","description":"Task to run","required":false,"default":"build"}]},{"slug":"integration-go-integration-tests","path":"integration/go/integration-tests","category":"integration","subcategory":"go","name":"Go Integration Tests","description":"Download the built artifact and run integration tests","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"app-name","description":"Application name; used in artifact names","required":true,"default":null},{"name":"integration-task","description":"Task to run","required":false,"default":"test:integration"},{"name":"env","description":"Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test","required":false,"default":""}]},{"slug":"integration-go-lint","path":"integration/go/lint","category":"integration","subcategory":"go","name":"Go Lint","description":"Run the Go linter via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"lint-task","description":"Task to run","required":false,"default":"lint"}]},{"slug":"integration-go-security","path":"integration/go/security","category":"integration","subcategory":"go","name":"Go Security","description":"Run security scans via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"security-task","description":"Task to run","required":false,"default":"security"}]},{"slug":"integration-go-test","path":"integration/go/test","category":"integration","subcategory":"go","name":"Go Test","description":"Run tests with coverage comparison against the main branch","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"test-coverage-task","description":"Task that runs tests and produces coverage.out","required":false,"default":"test:coverage"},{"name":"timeout-minutes","description":"Step timeout in minutes","required":false,"default":"8"}]},{"slug":"integration-node-build","path":"integration/node/build","category":"integration","subcategory":"node","name":"Node Build","description":"Build the Node.js project and upload it as an artifact","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"build-task","description":"Task to run","required":false,"default":"build"}]},{"slug":"integration-node-integration-tests","path":"integration/node/integration-tests","category":"integration","subcategory":"node","name":"Node Integration Tests","description":"Download the built artifact and run integration tests","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"app-name","description":"Application name; used in artifact names","required":true,"default":null},{"name":"integration-task","description":"Task to run","required":false,"default":"test:integration"},{"name":"env","description":"Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test","required":false,"default":""}]},{"slug":"integration-node-lint","path":"integration/node/lint","category":"integration","subcategory":"node","name":"Node Lint","description":"Run the Node.js linter via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"lint-task","description":"Task to run","required":false,"default":"lint"}]},{"slug":"integration-node-security","path":"integration/node/security","category":"integration","subcategory":"node","name":"Node Security","description":"Run security scans via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"security-task","description":"Task to run","required":false,"default":"security"}]},{"slug":"integration-node-test","path":"integration/node/test","category":"integration","subcategory":"node","name":"Node Test","description":"Run tests with coverage comparison against the main branch","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"test-coverage-task","description":"Task that runs vitest with coverage and produces coverage/lcov.info","required":false,"default":"test:coverage"},{"name":"test-task","description":"Task that runs tests without coverage","required":false,"default":"test"},{"name":"timeout-minutes","description":"Step timeout in minutes","required":false,"default":"8"}]},{"slug":"integration-python-integration-tests","path":"integration/python/integration-tests","category":"integration","subcategory":"python","name":"Python Integration Tests","description":"Run integration tests with configurable environment","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"integration-task","description":"Task to run","required":false,"default":"test:integration"},{"name":"env","description":"Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test","required":false,"default":""}]},{"slug":"integration-python-lint","path":"integration/python/lint","category":"integration","subcategory":"python","name":"Python Lint","description":"Run the Python linter via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"lint-task","description":"Task to run","required":false,"default":"lint"}]},{"slug":"integration-python-security","path":"integration/python/security","category":"integration","subcategory":"python","name":"Python Security","description":"Run security scans via mise","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"security-task","description":"Task to run","required":false,"default":"security"}]},{"slug":"integration-python-test","path":"integration/python/test","category":"integration","subcategory":"python","name":"Python Test","description":"Run tests with coverage comparison against the main branch","inputs":[{"name":"setup","description":"Tool setup method (bash, mise, node, just, none)","required":false,"default":"bash"},{"name":"node-version","description":"Node.js version (used when setup=node)","required":false,"default":"20"},{"name":"test-coverage-task","description":"Task that runs pytest and produces coverage.xml","required":false,"default":"test:coverage"},{"name":"test-task","description":"Task that runs tests without coverage","required":false,"default":"test"},{"name":"timeout-minutes","description":"Step timeout in minutes","required":false,"default":"8"}]},{"slug":"utilities-setup-just","path":"utilities/setup-just","category":"utilities","subcategory":null,"name":"Setup Just","description":"Install the just command runner (https://just.systems)","inputs":[]},{"slug":"utilities-setup-mise","path":"utilities/setup-mise","category":"utilities","subcategory":null,"name":"Setup mise","description":"Checkout code and install mise (https://mise.jdx.dev)","inputs":[{"name":"fetch-depth","description":"Number of commits to fetch. 0 indicates all history (needed for blame, diff, and comparing against the base branch).","required":false,"default":"0"}]},{"slug":"utilities-update-major-tag","path":"utilities/update-major-tag","category":"utilities","subcategory":null,"name":"Update Major Tag","description":"After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.","inputs":[{"name":"tag","description":"The semver tag that was just created (e.g. v1.2.3). Must already exist.","required":true,"default":null},{"name":"token","description":"GitHub token with permission to push tags","required":false,"default":"${{ github.token }}"},{"name":"update-minor","description":"Whether to also update the minor tag (e.g. v1.2)","required":false,"default":"true"}]},{"slug":"utilities-upsert-pr-comment","path":"utilities/upsert-pr-comment","category":"utilities","subcategory":null,"name":"Upsert PR Comment","description":"Post a new PR comment, update an existing one (matched by prefix), or delete it.","inputs":[{"name":"token","description":"GitHub token with permission to write PR comments","required":false,"default":"${{ github.token }}"},{"name":"comment-prefix","description":"The prefix string that identifies the comment (e.g. \\"## Coverage Report\\"). Used to find and update the existing comment instead of creating duplicates.","required":true,"default":null},{"name":"comment-body","description":"The full markdown body of the comment.","required":false,"default":""},{"name":"action","description":"Operation to perform. - upsert (default): create or update a comment matching the prefix - delete: remove the comment matching the prefix","required":false,"default":"upsert"}]}]');
+const ACTIONS = raw;
+function getAction(slug) {
+  return ACTIONS.find((a) => a.slug === slug);
+}
+const REPO_URL = "https://github.com/elpic/actions";
+const SITE_URL = "https://elpic.github.io/actions";
+function actionRepoUrl(a) {
+  return `${REPO_URL}/tree/main/${a.path}`;
+}
+const BASE_URL = "https://elpic.github.io/actions";
+const Route$2 = createFileRoute("/sitemap.xml")({
+  server: {
+    handlers: {
+      GET: async () => {
+        const entries = [
+          { path: "/", changefreq: "weekly", priority: "1.0" },
+          ...ACTIONS.map((a) => ({
+            path: `/actions/${a.slug}`,
+            changefreq: "monthly",
+            priority: "0.7"
+          }))
+        ];
+        const urls = entries.map(
+          (e) => `  <url>
+    <loc>${BASE_URL}${e.path}</loc>
+    <changefreq>${e.changefreq}</changefreq>
+    <priority>${e.priority}</priority>
+  </url>`
+        ).join("\n");
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+        return new Response(xml, {
+          headers: {
+            "Content-Type": "application/xml",
+            "Cache-Control": "public, max-age=3600"
+          }
+        });
+      }
+    }
+  }
+});
+const $$splitComponentImporter$1 = () => import("./index-DQufpdK8.js");
+const Route$1 = createFileRoute("/")({
   head: () => ({
     meta: [{
-      title: "elpic/actions - Reusable GitHub Actions & integration/CD workflows"
+      title: "elpic/actions - Reusable GitHub Actions for integration & delivery"
     }, {
       name: "description",
       content: "A curated collection of composite GitHub Actions for integration, delivery, and repo utilities. Drop-in steps for Go, Python, and PyPI pipelines."
@@ -4742,29 +4792,117 @@ const Route2 = createFileRoute("/")({
     }, {
       property: "og:type",
       content: "website"
+    }, {
+      property: "og:url",
+      content: "https://elpic.github.io/actions/"
+    }, {
+      name: "twitter:title",
+      content: "elpic/actions - Reusable GitHub Actions"
+    }, {
+      name: "twitter:description",
+      content: "Composite GitHub Actions for integration, release, and delivery."
+    }],
+    links: [{
+      rel: "canonical",
+      href: "https://elpic.github.io/actions/"
     }]
   }),
+  component: lazyRouteComponent($$splitComponentImporter$1, "component")
+});
+const $$splitComponentImporter = () => import("./actions._slug-iqQfSc1z.js");
+const $$splitNotFoundComponentImporter = () => import("./actions._slug-DOx55ze8.js");
+const Route2 = createFileRoute("/actions/$slug")({
+  loader: ({
+    params
+  }) => {
+    const action = getAction(params.slug);
+    if (!action) throw notFound();
+    return {
+      action
+    };
+  },
+  head: ({
+    loaderData
+  }) => {
+    const a = loaderData?.action;
+    if (!a) return {};
+    const title = `${a.name} - elpic/actions`;
+    const desc = a.description;
+    const url = `${SITE_URL}/actions/${a.slug}`;
+    return {
+      meta: [{
+        title
+      }, {
+        name: "description",
+        content: desc
+      }, {
+        property: "og:title",
+        content: title
+      }, {
+        property: "og:description",
+        content: desc
+      }, {
+        property: "og:url",
+        content: url
+      }, {
+        property: "og:type",
+        content: "article"
+      }, {
+        name: "twitter:title",
+        content: title
+      }, {
+        name: "twitter:description",
+        content: desc
+      }],
+      links: [{
+        rel: "canonical",
+        href: url
+      }]
+    };
+  },
+  notFoundComponent: lazyRouteComponent($$splitNotFoundComponentImporter, "notFoundComponent"),
   component: lazyRouteComponent($$splitComponentImporter, "component")
 });
-const IndexRoute = Route2.update({
+const SitemapDotxmlRoute = Route$2.update({
+  id: "/sitemap.xml",
+  path: "/sitemap.xml",
+  getParentRoute: () => Route$3
+});
+const IndexRoute = Route$1.update({
   id: "/",
   path: "/",
-  getParentRoute: () => Route$1
+  getParentRoute: () => Route$3
+});
+const ActionsSlugRoute = Route2.update({
+  id: "/actions/$slug",
+  path: "/actions/$slug",
+  getParentRoute: () => Route$3
 });
 const rootRouteChildren = {
-  IndexRoute
+  IndexRoute,
+  SitemapDotxmlRoute,
+  ActionsSlugRoute
 };
-const routeTree = Route$1._addFileChildren(rootRouteChildren)._addFileTypes();
+const routeTree = Route$3._addFileChildren(rootRouteChildren)._addFileTypes();
 const getRouter = () => {
   const queryClient = new QueryClient();
-  const router = createRouter({
+  const router2 = createRouter({
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0
   });
-  return router;
+  return router2;
 };
-export {
+const router = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
   getRouter
+}, Symbol.toStringTag, { value: "Module" }));
+export {
+  ACTIONS as A,
+  Link as L,
+  Route2 as R,
+  actionRepoUrl as a,
+  REPO_URL as b,
+  router as r
 };
