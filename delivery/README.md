@@ -6,6 +6,8 @@ Composite actions for release and publishing workflows.
 
 | Registry | Actions |
 |----------|---------|
+| [`docker/`](docker/) | [publish](docker/publish/) — Build and push Docker images |
+| [`pages/`](pages/) | [publish](pages/publish/) — Build and deploy to GitHub Pages |
 | [`python/`](python/) | [build](python/build/), [publish](python/publish/) — PyPI, GitHub Packages, or JFrog |
 
 ## Examples by registry

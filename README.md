@@ -73,7 +73,7 @@ jobs:
 | Category | Description | Actions |
 |----------|-------------|---------|
 | [`integration/`](integration/) | PR checks — test, lint, build, security | [Go](integration/go/), [Node](integration/node/), [Python](integration/python/) |
-| [`delivery/`](delivery/) | Release and publish packages | [Python](delivery/python/) |
+| [`delivery/`](delivery/) | Release and publish packages | [Docker](delivery/docker/), [Pages](delivery/pages/), [Python](delivery/python/) |
 | [`github/`](github/) | GitHub-specific utilities | [blueprint-check](github/blueprint-check/) |
 | [`utilities/`](utilities/) | General-purpose composites | [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
 
@@ -95,6 +95,8 @@ jobs:
 | `integration/python/lint` | ruff + mypy |
 | `integration/python/integration-tests` | Python integration tests |
 | `integration/python/security` | bandit + safety |
+| `delivery/docker/publish` | Build and push Docker images to a container registry |
+| `delivery/pages/publish` | Build a static site and deploy to GitHub Pages |
 | `delivery/python/build` | Build Python wheel + upload artifact |
 | `delivery/python/publish` | Publish to PyPI, GitHub Packages, or JFrog |
 | `github/blueprint-check` | PR drift detection for blueprint templates |
