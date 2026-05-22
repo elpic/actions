@@ -3,15 +3,15 @@ description: Run the Python linter via mise
 
 inputs:
   setup:
-    description: Tool setup method (mise, node, just, none)
+    description: Tool setup method (bash, mise, node, just, none)
     required: false
-    default: mise
+    default: bash
   node-version:
     description: Node.js version (used when setup=node)
     required: false
     default: "20"
   lint-task:
-    description: mise task for the linter
+    description: Task to run
     required: false
     default: lint
 
@@ -29,6 +29,9 @@ runs:
       shell: bash
       run: |
         curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+    - if: inputs.setup == 'bash' || inputs.setup == ''
+      shell: bash
+      run: ${{ inputs.lint-task }}
     - if: inputs.setup == 'mise'
       shell: bash
       run: mise run ${{ inputs.lint-task }}

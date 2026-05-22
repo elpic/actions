@@ -112,7 +112,8 @@ Each integration action supports three tool runners via the `setup` input:
 
 | `setup` value | Effect |
 |--------------|--------|
-| `mise` (default) | `jdx/mise-action@v2` + `mise run <task>` |
+| `bash` (default) | Runs `<task>` directly as a bash command |
+| `mise` | `jdx/mise-action@v2` + `mise run <task>` |
 | `node` | `actions/setup-node@v4` + `npm run <task>` |
 | `just` | Install `just` + `just <task>` |
 | `none` | No tool setup |

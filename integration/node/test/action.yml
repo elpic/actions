@@ -3,9 +3,9 @@ description: Run tests with coverage comparison against the main branch
 
 inputs:
   setup:
-    description: Tool setup method (mise, node, just, none)
+    description: Tool setup method (bash, mise, node, just, none)
     required: false
-    default: mise
+    default: bash
   node-version:
     description: Node.js version (used when setup=node)
     required: false
@@ -68,7 +68,8 @@ runs:
       shell: bash
       run: |
         case "${{ inputs.setup }}" in
-          mise) mise run ${{ inputs.test-task }} ;;
+          bash|*) ${{ inputs.test-task }} ;;
+          mise) mise run ${{ inputs.test-coverage-task }} ;;
           node) npm run ${{ inputs.test-task }} ;;
           just) just ${{ inputs.test-task }} ;;
         esac
@@ -78,6 +79,7 @@ runs:
       shell: bash
       run: |
         case "${{ inputs.setup }}" in
+          bash|*) ${{ inputs.test-coverage-task }} ;;
           mise) mise run ${{ inputs.test-coverage-task }} ;;
           node) npm run ${{ inputs.test-coverage-task }} ;;
           just) just ${{ inputs.test-coverage-task }} ;;
