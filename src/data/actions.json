@@ -79,7 +79,7 @@
     "category": "delivery",
     "subcategory": "github-release",
     "name": "GitHub Release Publish",
-    "description": "Download the build artifact and create a GitHub Release with auto-generated release notes",
+    "description": "Download the build artifact and create a GitHub Release",
     "inputs": [
       {
         "name": "app-name",
@@ -163,7 +163,7 @@
     "category": "delivery",
     "subcategory": "python",
     "name": "Python Publish",
-    "description": "Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory",
+    "description": "Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory.\n",
     "inputs": [
       {
         "name": "app-name",
@@ -209,7 +209,7 @@
     "category": "github",
     "subcategory": null,
     "name": "Blueprint Drift Check",
-    "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.",
+    "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.\n",
     "inputs": [
       {
         "name": "blueprint-file",
@@ -241,9 +241,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -253,7 +253,7 @@
       },
       {
         "name": "build-task",
-        "description": "mise task that builds the binary",
+        "description": "Task to run",
         "required": false,
         "default": "build"
       }
@@ -269,9 +269,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -287,13 +287,13 @@
       },
       {
         "name": "integration-task",
-        "description": "Task for integration tests",
+        "description": "Task to run",
         "required": false,
         "default": "test:integration"
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
       }
@@ -309,9 +309,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -321,7 +321,7 @@
       },
       {
         "name": "lint-task",
-        "description": "mise task for the linter",
+        "description": "Task to run",
         "required": false,
         "default": "lint"
       }
@@ -337,9 +337,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -349,7 +349,7 @@
       },
       {
         "name": "security-task",
-        "description": "mise task for security scans",
+        "description": "Task to run",
         "required": false,
         "default": "security"
       }
@@ -365,9 +365,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -399,9 +399,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -411,7 +411,7 @@
       },
       {
         "name": "build-task",
-        "description": "mise task that builds the project",
+        "description": "Task to run",
         "required": false,
         "default": "build"
       }
@@ -427,9 +427,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -438,22 +438,22 @@
         "default": "20"
       },
       {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
+      },
+      {
         "name": "integration-task",
-        "description": "Task for integration tests",
+        "description": "Task to run",
         "required": false,
         "default": "test:integration"
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
-      },
-      {
-        "name": "app-name",
-        "description": "Application name; used in artifact names",
-        "required": true,
-        "default": null
       }
     ]
   },
@@ -467,9 +467,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -479,7 +479,7 @@
       },
       {
         "name": "lint-task",
-        "description": "mise task for the linter",
+        "description": "Task to run",
         "required": false,
         "default": "lint"
       }
@@ -495,9 +495,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -507,7 +507,7 @@
       },
       {
         "name": "security-task",
-        "description": "mise task for security scans",
+        "description": "Task to run",
         "required": false,
         "default": "security"
       }
@@ -523,9 +523,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -563,9 +563,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -575,13 +575,13 @@
       },
       {
         "name": "integration-task",
-        "description": "Task for integration tests",
+        "description": "Task to run",
         "required": false,
         "default": "test:integration"
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
       }
@@ -597,9 +597,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -609,7 +609,7 @@
       },
       {
         "name": "lint-task",
-        "description": "mise task for the linter",
+        "description": "Task to run",
         "required": false,
         "default": "lint"
       }
@@ -625,9 +625,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -637,7 +637,7 @@
       },
       {
         "name": "security-task",
-        "description": "mise task for security scans",
+        "description": "Task to run",
         "required": false,
         "default": "security"
       }
@@ -653,9 +653,9 @@
     "inputs": [
       {
         "name": "setup",
-        "description": "Tool setup method (mise, node, just, none)",
+        "description": "Tool setup method (bash, mise, node, just, none)",
         "required": false,
-        "default": "mise"
+        "default": "bash"
       },
       {
         "name": "node-version",
@@ -684,6 +684,15 @@
     ]
   },
   {
+    "slug": "utilities-setup-just",
+    "path": "utilities/setup-just",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Setup Just",
+    "description": "Install the just command runner (https://just.systems)",
+    "inputs": []
+  },
+  {
     "slug": "utilities-setup-mise",
     "path": "utilities/setup-mise",
     "category": "utilities",
@@ -705,7 +714,7 @@
     "category": "utilities",
     "subcategory": null,
     "name": "Update Major Tag",
-    "description": "After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.",
+    "description": "After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.\n",
     "inputs": [
       {
         "name": "tag",
@@ -733,7 +742,7 @@
     "category": "utilities",
     "subcategory": null,
     "name": "Upsert PR Comment",
-    "description": "Post a new PR comment, update an existing one (matched by prefix), or delete it.",
+    "description": "Post a new PR comment, update an existing one (matched by prefix), or delete it.\n",
     "inputs": [
       {
         "name": "token",
