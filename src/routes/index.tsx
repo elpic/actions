@@ -12,8 +12,6 @@ import {
   Shield,
   Zap,
   Layers,
-  Box,
-  FileCode,
 } from "lucide-react";
 import { ACTIONS } from "@/lib/actions-data";
 
@@ -383,97 +381,35 @@ function Landing() {
         </div>
       </section>
 
-      {/* Sibling project: Templates */}
+      {/* Sibling project */}
       <section id="templates" className="border-t border-border/60">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="mb-10 flex items-end justify-between gap-6">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-primary">
-                / sibling project
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                elpic/templates
-              </h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Reusable templates for containers and CI/CD workflows, rendered
-                with{" "}
-                <a
-                  href="https://github.com/elpic/blueprint"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-foreground underline-offset-4 hover:underline"
-                >
-                  blueprint
-                </a>
-                . One source of truth for Dockerfiles and workflow files —
-                update the blueprint, re-render, stay in sync.
-              </p>
-            </div>
+          <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 transition-colors hover:border-primary/40">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 font-mono text-xs text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              sibling project
+            </span>
+            <h2 className="mt-5 text-2xl font-semibold tracking-tight">
+              <span className="font-mono">elpic/templates</span>
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Blueprint-rendered templates for Dockerfiles and GitHub Actions
+              workflows. Declare versions once, render every file, and detect
+              drift automatically in CI.
+            </p>
             <a
-              href="https://github.com/elpic/templates"
+              href="https://elpic.github.io/templates/"
               target="_blank"
               rel="noreferrer"
-              className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline-flex sm:items-center sm:gap-1"
+              className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:glow-primary"
             >
-              View repo <ArrowRight className="h-4 w-4" />
+              Visit elpic/templates
+              <ArrowRight className="h-4 w-4" />
             </a>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2">
-            {[
-              {
-                icon: Box,
-                name: "containers",
-                blurb: "Production + dev Dockerfiles",
-                items: ["python"],
-                href: "https://github.com/elpic/templates/tree/main/containers",
-              },
-              {
-                icon: FileCode,
-                name: "actions",
-                blurb: "Composable workflow definitions",
-                items: ["github/blueprint-check", "github/integration/go", "github/integration/python"],
-                href: "https://github.com/elpic/templates/tree/main/actions",
-              },
-            ].map((cat) => (
-              <a
-                key={cat.name}
-                href={cat.href}
-                target="_blank"
-                rel="noreferrer"
-                className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 transition-all hover:border-primary/40"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-lg bg-secondary text-primary">
-                      <cat.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-mono text-lg font-semibold">
-                        {cat.name}<span className="text-muted-foreground">/</span>
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{cat.blurb}</p>
-                    </div>
-                  </div>
-                  <span className="rounded-full border border-border bg-secondary/60 px-2.5 py-1 font-mono text-xs text-muted-foreground">
-                    {cat.items.length}
-                  </span>
-                </div>
-                <ul className="mt-5 flex flex-wrap gap-2">
-                  {cat.items.map((it) => (
-                    <li
-                      key={it}
-                      className="inline-block rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90"
-                    >
-                      {it}
-                    </li>
-                  ))}
-                </ul>
-              </a>
-            ))}
           </div>
         </div>
       </section>
+
 
       {/* CTA */}
       <section className="border-t border-border/60">
