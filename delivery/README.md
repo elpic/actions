@@ -6,9 +6,32 @@ Composite actions for release and publishing workflows.
 
 | Registry | Actions |
 |----------|---------|
+| [`github-release/`](github-release/) | [publish](github-release/publish/) |
 | [`pypi/`](pypi/) | [build](pypi/build/), [publish](pypi/publish/) |
 
-## Full workflow example
+## GitHub Release example
+
+```yaml
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: elpic/actions/delivery/github-release/publish@v1
+        with:
+          app-name: myapp
+```
+
+## PyPI workflow example
 
 ```yaml
 name: Publish
