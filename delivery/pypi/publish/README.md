@@ -1,35 +1,41 @@
 # delivery/pypi/publish
 
-Publish a built Python package to PyPI using Trusted Publishing (OIDC).
+Publish a built Python package to PyPI, GitHub Packages, or JFrog Artifactory.
 
 ## Usage
 
+### PyPI (default)
+
 ```yaml
-name: Publish
-on:
-  push:
-    branches: [main]
-
-permissions:
-  id-token: write
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    needs: [build]
-    timeout-minutes: 10
-    environment:
-      name: pypi
-      url: https://pypi.org/project/my-pypi-package/
-    steps:
-      - uses: elpic/actions/delivery/pypi/publish@v1
-        with:
-          app-name: myapp
+- uses: elpic/actions/delivery/pypi/publish@v1
+  with:
+    app-name: myapp
+    registry: pypi
 ```
 
-## Inputs
+Requires a `pypi` environment with [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) configured on PyPI.
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `app-name` | yes | -- | Application name |
-| `pypi-package-dir` | no | `dist` | Directory with built artifacts |
+### GitHub Packages
+
+```yaml
+- uses: elpic/actions/delivery/pypi/publish@v1
+  with:
+    app-name: myapp
+    registry: github
+```
+
+Requires `packages: write` permission on the `GITHUB_TOKEN`.
+
+### JFrog Artifactory
+
+```yaml
+- uses: elpic/actions/delivery/pypi/publish@v1
+  with:
+    app-name: myapp
+    registry: jfrog
+    jfrog-url: ${{ secrets.JFROG_URL }}
+    jfrog-user: ${{ secrets.JFROG_USER }}
+    jfrog-token: ${{ secrets.JFROG_TOKEN }}
+```
+
+Secrets must be configured in your repository or organisation.

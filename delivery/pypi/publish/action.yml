@@ -1,14 +1,33 @@
 name: PyPI Publish
-description: Publish a built Python package to PyPI using Trusted Publishing (OIDC)
+description: >
+  Publish a built Python package to PyPI (Trusted Publishing),
+  GitHub Packages, or JFrog Artifactory.
 
 inputs:
   app-name:
     description: Application name; used in artifact names
     required: true
-  pypi-package-dir:
-    description: Directory containing built artifacts (relative to repo root)
+  registry:
+    description: Target registry (pypi, github, jfrog)
+    required: false
+    default: pypi
+  packages-dir:
+    description: Directory containing built artifacts
     required: false
     default: dist
+  # JFrog-specific inputs — required when registry=jfrog
+  jfrog-url:
+    description: JFrog Artifactory PyPI repository URL (required when registry=jfrog)
+    required: false
+    default: ""
+  jfrog-user:
+    description: JFrog username (required when registry=jfrog)
+    required: false
+    default: ""
+  jfrog-token:
+    description: JFrog API token or password (required when registry=jfrog)
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -17,6 +36,33 @@ runs:
       with:
         name: ${{ inputs.app-name }}-dist
 
-    - uses: pypa/gh-action-pypi-publish@release/v1
+    # ── PyPI (Trusted Publishing / OIDC) ──────────────────────────────
+    - if: inputs.registry == 'pypi'
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        packages-dir: ${{ inputs.pypi-package-dir }}
+        packages-dir: ${{ inputs.packages-dir }}
+
+    # ── GitHub Packages ───────────────────────────────────────────────
+    # Uses the built-in GITHUB_TOKEN with packages: write permission.
+    - if: inputs.registry == 'github'
+      shell: bash
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ github.token }}
+      run: |
+        pip install twine -q
+        twine upload \
+          --repository-url https://pypi.pkg.github.com/${{ github.repository_owner }}/ \
+          ${{ inputs.packages-dir }}/*
+
+    # ── JFrog Artifactory ─────────────────────────────────────────────
+    # Secrets must be passed via the action inputs (jfrog-url, jfrog-user, jfrog-token).
+    - if: inputs.registry == 'jfrog'
+      shell: bash
+      run: |
+        pip install twine -q
+        twine upload \
+          --repository-url ${{ inputs.jfrog-url }} \
+          -u ${{ inputs.jfrog-user }} \
+          -p ${{ inputs.jfrog-token }} \
+          ${{ inputs.packages-dir }}/*

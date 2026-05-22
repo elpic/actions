@@ -1,13 +1,13 @@
 # delivery/pypi
 
-Composite actions for releasing Python packages to PyPI with Trusted Publishing (OIDC).
+Composite actions for releasing Python packages to PyPI, GitHub Packages, or JFrog Artifactory.
 
 ## Actions
 
 | Action | Description |
 |--------|-------------|
 | [`build`](build/) | Build the package wheel and upload as artifact |
-| [`publish`](publish/) | Publish the built artifact to PyPI |
+| [`publish`](publish/) | Publish the built artifact to PyPI, GitHub Packages, or JFrog |
 
 ## Usage
 

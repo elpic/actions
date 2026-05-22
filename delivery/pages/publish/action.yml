@@ -1,0 +1,60 @@
+name: GitHub Pages Publish
+description: Build a static site and deploy it to GitHub Pages
+
+inputs:
+  build-command:
+    description: Command to build the static site (e.g. bun run build, npm run build, make build)
+    required: true
+  output-directory:
+    description: Directory containing the built static files (relative to repo root)
+    required: false
+    default: dist
+  setup-command:
+    description: Optional command to run before the build (e.g. npm ci, bun install, pip install -r requirements.txt)
+    required: false
+    default: ""
+  base-path:
+    description: >
+      Base path for the site. For user/org sites (username.github.io) this is empty.
+      For project sites (username.github.io/repo) this is /repo.
+      Leave empty to let the action derive it from the repository name.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup GitHub Pages
+      uses: actions/configure-pages@v5
+
+    - name: Derive base path
+      id: base-path
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.base-path }}" ]; then
+          echo "path=${{ inputs.base-path }}" >> $GITHUB_OUTPUT
+        else
+          echo "path=/${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run setup command
+      if: inputs.setup-command != ''
+      shell: bash
+      run: ${{ inputs.setup-command }}
+
+    - name: Build site
+      shell: bash
+      env:
+        BASE_PATH: ${{ steps.base-path.outputs.path }}
+      run: ${{ inputs.build-command }}
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ${{ inputs.output-directory }}
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v5
