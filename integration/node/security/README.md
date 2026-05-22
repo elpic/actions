@@ -1,4 +1,4 @@
-# integration/node/security
+# Node.js Security
 
 Run Node.js security scans (npm audit) via mise.
 

@@ -1,4 +1,4 @@
-# utilities
+# Utilities
 
 Reusable composite actions with `action.yml`.
 

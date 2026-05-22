@@ -1,4 +1,4 @@
-# integration/python/security
+# Python Security
 
 Run Python security scans (bandit + safety) via mise.
 

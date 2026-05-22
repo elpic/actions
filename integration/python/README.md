@@ -1,4 +1,4 @@
-# integration/python
+# Python
 
 Composite actions for Python CI — test, lint, integration tests, and security.
 

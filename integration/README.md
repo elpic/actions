@@ -1,4 +1,4 @@
-# integration
+# Integration
 
 Composite actions for pull request checks — test, lint, build, integration tests, and security.
 

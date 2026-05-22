@@ -1,4 +1,4 @@
-# integration/python/lint
+# Python Lint
 
 Run the Python linter (ruff + mypy) via mise.
 

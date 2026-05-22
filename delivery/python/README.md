@@ -1,13 +1,13 @@
-# delivery/pypi
+# Python
 
-Composite actions for releasing Python packages to PyPI with Trusted Publishing (OIDC).
+Composite actions for releasing Python packages to PyPI, GitHub Packages, or JFrog Artifactory.
 
 ## Actions
 
 | Action | Description |
 |--------|-------------|
 | [`build`](build/) | Build the package wheel and upload as artifact |
-| [`publish`](publish/) | Publish the built artifact to PyPI |
+| [`publish`](publish/) | Publish the built artifact to PyPI, GitHub Packages, or JFrog |
 
 ## Usage
 
@@ -52,7 +52,7 @@ jobs:
     runs-on: *runner
     timeout-minutes: 15
     steps:
-      - uses: elpic/actions/delivery/pypi/build@v1
+      - uses: elpic/actions/delivery/python/build@v1
         with:
           app-name: myapp
           pypi-project-name: my-pypi-package
@@ -66,7 +66,7 @@ jobs:
       name: pypi
       url: https://pypi.org/project/my-pypi-package/
     steps:
-      - uses: elpic/actions/delivery/pypi/publish@v1
+      - uses: elpic/actions/delivery/python/publish@v1
 ```
 
 ### Dev builds vs stable releases

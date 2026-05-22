@@ -1,4 +1,4 @@
-# github
+# GitHub
 
 GitHub-specific workflow utilities.
 

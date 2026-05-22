@@ -1,4 +1,4 @@
-# integration/node
+# Node.js
 
 Composite actions for Node.js CI — test, lint, build, integration tests, and security.
 

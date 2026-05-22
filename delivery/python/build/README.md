@@ -1,4 +1,4 @@
-# delivery/pypi/build
+# Python Build
 
 Build a Python package wheel and upload it as an artifact for the `publish` action.
 
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: elpic/actions/delivery/pypi/build@v1
+      - uses: elpic/actions/delivery/python/build@v1
         with:
           app-name: myapp
           pypi-package-dir: dist

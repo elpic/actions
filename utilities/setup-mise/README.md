@@ -1,4 +1,4 @@
-# utilities/setup-mise
+# Setup Mise
 
 Checkout + [mise](https://mise.jdx.dev) install in one step.
 

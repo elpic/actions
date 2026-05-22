@@ -1,4 +1,4 @@
-# integration/node/integration-tests
+# Node.js Integration Tests
 
 Download the built artifact and run Node.js integration tests with services.
 

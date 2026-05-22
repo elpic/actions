@@ -1,4 +1,4 @@
-# integration/go/lint
+# Go Lint
 
 Run the Go linter via mise.
 

@@ -1,4 +1,4 @@
-# utilities/update-major-tag
+# Update Major Tag
 
 After tagging a release (`v1.2.3`), move the floating `v1` and `v1.2` tags.
 

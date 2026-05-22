@@ -1,4 +1,4 @@
-# integration/go/test
+# Go Test
 
 Run tests with coverage comparison against the main branch.
 
