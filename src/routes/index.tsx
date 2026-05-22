@@ -122,6 +122,7 @@ function Landing() {
             <a href="#categories" className="transition-colors hover:text-foreground">Categories</a>
             <a href="#usage" className="transition-colors hover:text-foreground">Usage</a>
             <a href="#versioning" className="transition-colors hover:text-foreground">Versioning</a>
+            <a href="#templates" className="transition-colors hover:text-foreground">Templates</a>
           </nav>
           <a
             href={REPO}
