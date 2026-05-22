@@ -46,6 +46,56 @@
     ]
   },
   {
+    "slug": "delivery-github-release-build",
+    "path": "delivery/github-release/build",
+    "category": "delivery",
+    "subcategory": "github-release",
+    "name": "GitHub Release Build",
+    "description": "Build the application and upload as artifact for release",
+    "inputs": [
+      {
+        "name": "app-name",
+        "description": "Application name; used in artifact names",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "build-task",
+        "description": "mise task that builds the application",
+        "required": false,
+        "default": "build"
+      },
+      {
+        "name": "build-output",
+        "description": "Directory containing the built output",
+        "required": false,
+        "default": "dist"
+      }
+    ]
+  },
+  {
+    "slug": "delivery-github-release-publish",
+    "path": "delivery/github-release/publish",
+    "category": "delivery",
+    "subcategory": "github-release",
+    "name": "GitHub Release Publish",
+    "description": "Download the build artifact and create a GitHub Release with auto-generated release notes",
+    "inputs": [
+      {
+        "name": "app-name",
+        "description": "Application name; used to download the correct artifact",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "build-output",
+        "description": "Directory where the built artifact was extracted",
+        "required": false,
+        "default": "dist"
+      }
+    ]
+  },
+  {
     "slug": "delivery-pages-publish",
     "path": "delivery/pages/publish",
     "category": "delivery",
