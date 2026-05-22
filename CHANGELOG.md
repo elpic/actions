@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/elpic/actions/compare/v1.2.0...v1.3.0) (2026-05-22)
+
+
+### Features
+
+* add delivery/github-release actions, change default setup to bash ([32c5d23](https://github.com/elpic/actions/commit/32c5d2374dcf2349d4be58c4aa0a189d203fe08b))
+
 ## [1.2.0](https://github.com/elpic/actions/compare/v1.1.0...v1.2.0) (2026-05-22)
 
 
