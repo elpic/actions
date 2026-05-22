@@ -1,4 +1,4 @@
-name: PyPI Publish
+name: Python Publish
 description: >
   Publish a built Python package to PyPI (Trusted Publishing),
   GitHub Packages, or JFrog Artifactory.
