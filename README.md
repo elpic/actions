@@ -73,7 +73,7 @@ jobs:
 | Category | Description | Actions |
 |----------|-------------|---------|
 | [`integration/`](integration/) | PR checks — test, lint, build, security | [Go](integration/go/), [Node](integration/node/), [Python](integration/python/) |
-| [`delivery/`](delivery/) | Release and publish packages | [PyPI](delivery/pypi/) |
+| [`delivery/`](delivery/) | Release and publish packages | [Python](delivery/python/) |
 | [`github/`](github/) | GitHub-specific utilities | [blueprint-check](github/blueprint-check/) |
 | [`utilities/`](utilities/) | General-purpose composites | [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
 
@@ -95,8 +95,8 @@ jobs:
 | `integration/python/lint` | ruff + mypy |
 | `integration/python/integration-tests` | Python integration tests |
 | `integration/python/security` | bandit + safety |
-| `delivery/pypi/build` | Build Python wheel + upload artifact |
-| `delivery/pypi/publish` | Publish to PyPI via OIDC |
+| `delivery/python/build` | Build Python wheel + upload artifact |
+| `delivery/python/publish` | Publish to PyPI, GitHub Packages, or JFrog |
 | `github/blueprint-check` | PR drift detection for blueprint templates |
 | `utilities/setup-mise` | Checkout + mise install in one step |
 | `utilities/update-major-tag` | Move floating tags after release |

@@ -1,4 +1,4 @@
-# delivery/pypi/publish
+# delivery/python/publish
 
 Publish a built Python package to PyPI, GitHub Packages, or JFrog Artifactory.
 
@@ -7,7 +7,7 @@ Publish a built Python package to PyPI, GitHub Packages, or JFrog Artifactory.
 ### PyPI (default)
 
 ```yaml
-- uses: elpic/actions/delivery/pypi/publish@v1
+- uses: elpic/actions/delivery/python/publish@v1
   with:
     app-name: myapp
     registry: pypi
@@ -18,7 +18,7 @@ Requires a `pypi` environment with [Trusted Publishing](https://docs.pypi.org/tr
 ### GitHub Packages
 
 ```yaml
-- uses: elpic/actions/delivery/pypi/publish@v1
+- uses: elpic/actions/delivery/python/publish@v1
   with:
     app-name: myapp
     registry: github
@@ -29,7 +29,7 @@ Requires `packages: write` permission on the `GITHUB_TOKEN`.
 ### JFrog Artifactory
 
 ```yaml
-- uses: elpic/actions/delivery/pypi/publish@v1
+- uses: elpic/actions/delivery/python/publish@v1
   with:
     app-name: myapp
     registry: jfrog

@@ -6,7 +6,7 @@ Composite actions for release and publishing workflows.
 
 | Registry | Actions |
 |----------|---------|
-| [`pypi/`](pypi/) | [build](pypi/build/), [publish](pypi/publish/) — PyPI, GitHub Packages, or JFrog |
+| [`python/`](python/) | [build](python/build/), [publish](python/publish/) — PyPI, GitHub Packages, or JFrog |
 
 ## Examples by registry
 
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: elpic/actions/delivery/pypi/build@v1
+      - uses: elpic/actions/delivery/python/build@v1
         with:
           app-name: myapp
 
@@ -38,7 +38,7 @@ jobs:
       name: pypi
       url: https://pypi.org/project/my-pypi-package/
     steps:
-      - uses: elpic/actions/delivery/pypi/publish@v1
+      - uses: elpic/actions/delivery/python/publish@v1
         with:
           app-name: myapp
           registry: pypi
@@ -55,7 +55,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: elpic/actions/delivery/pypi/publish@v1
+      - uses: elpic/actions/delivery/python/publish@v1
         with:
           app-name: myapp
           registry: github
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: elpic/actions/delivery/pypi/publish@v1
+      - uses: elpic/actions/delivery/python/publish@v1
         with:
           app-name: myapp
           registry: jfrog
