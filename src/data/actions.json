@@ -1,9 +1,89 @@
 [
   {
-    "slug": "delivery-pypi-build",
-    "path": "delivery/pypi/build",
+    "slug": "delivery-docker-publish",
+    "path": "delivery/docker/publish",
     "category": "delivery",
-    "subcategory": "pypi",
+    "subcategory": "docker",
+    "name": "Docker Publish",
+    "description": "Build, tag, and push a Docker image to a container registry",
+    "inputs": [
+      {
+        "name": "app-name",
+        "description": "Application name; used in image tags",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "registry",
+        "description": "Container registry URL (e.g. ghcr.io, docker.io, aws_account_id.dkr.ecr.region.amazonaws.com)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "dockerfile",
+        "description": "Path to the Dockerfile",
+        "required": false,
+        "default": "Dockerfile"
+      },
+      {
+        "name": "build-context",
+        "description": "Docker build context directory",
+        "required": false,
+        "default": "."
+      },
+      {
+        "name": "build-task",
+        "description": "mise task for pre-build steps (optional)",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "additional-tags",
+        "description": "Comma-separated list of additional tags to apply",
+        "required": false,
+        "default": ""
+      }
+    ]
+  },
+  {
+    "slug": "delivery-pages-publish",
+    "path": "delivery/pages/publish",
+    "category": "delivery",
+    "subcategory": "pages",
+    "name": "GitHub Pages Publish",
+    "description": "Build a static site and deploy it to GitHub Pages",
+    "inputs": [
+      {
+        "name": "build-command",
+        "description": "Command to build the static site (e.g. bun run build, npm run build, make build)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "output-directory",
+        "description": "Directory containing the built static files (relative to repo root)",
+        "required": false,
+        "default": "dist"
+      },
+      {
+        "name": "setup-command",
+        "description": "Optional command to run before the build (e.g. npm ci, bun install, pip install -r requirements.txt)",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "base-path",
+        "description": "Base path for the site. For user/org sites (username.github.io) this is empty. For project sites (username.github.io/repo) this is /repo. Leave empty to let the action derive it from the repository name.",
+        "required": false,
+        "default": ""
+      }
+    ]
+  },
+  {
+    "slug": "delivery-python-build",
+    "path": "delivery/python/build",
+    "category": "delivery",
+    "subcategory": "python",
     "name": "PyPI Build",
     "description": "Build a Python package wheel and upload it as an artifact",
     "inputs": [
@@ -28,12 +108,12 @@
     ]
   },
   {
-    "slug": "delivery-pypi-publish",
-    "path": "delivery/pypi/publish",
+    "slug": "delivery-python-publish",
+    "path": "delivery/python/publish",
     "category": "delivery",
-    "subcategory": "pypi",
-    "name": "PyPI Publish",
-    "description": "Publish a built Python package to PyPI using Trusted Publishing (OIDC)",
+    "subcategory": "python",
+    "name": "Python Publish",
+    "description": "Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory",
     "inputs": [
       {
         "name": "app-name",
@@ -42,10 +122,34 @@
         "default": null
       },
       {
-        "name": "pypi-package-dir",
-        "description": "Directory containing built artifacts (relative to repo root)",
+        "name": "registry",
+        "description": "Target registry (pypi, github, jfrog)",
+        "required": false,
+        "default": "pypi"
+      },
+      {
+        "name": "packages-dir",
+        "description": "Directory containing built artifacts",
         "required": false,
         "default": "dist"
+      },
+      {
+        "name": "jfrog-url",
+        "description": "JFrog Artifactory PyPI repository URL (required when registry=jfrog)",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "jfrog-user",
+        "description": "JFrog username (required when registry=jfrog)",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "jfrog-token",
+        "description": "JFrog API token or password (required when registry=jfrog)",
+        "required": false,
+        "default": ""
       }
     ]
   },

@@ -142,7 +142,7 @@ function Landing() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              v1.1.0 - released today
+              v1.2.0 - released today
             </div>
             <h1 className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
               Reusable GitHub Actions,{" "}
@@ -225,7 +225,7 @@ function Landing() {
                 / categories
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Twenty actions, organized by intent.
+                {ACTIONS.length} actions, organized by intent.
               </h2>
             </div>
             <a
