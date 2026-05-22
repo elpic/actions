@@ -163,7 +163,7 @@
     "category": "delivery",
     "subcategory": "python",
     "name": "Python Publish",
-    "description": "Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory.\n",
+    "description": "Publish a built Python package to PyPI (Trusted Publishing), GitHub Packages, or JFrog Artifactory.",
     "inputs": [
       {
         "name": "app-name",
@@ -209,7 +209,7 @@
     "category": "github",
     "subcategory": null,
     "name": "Blueprint Drift Check",
-    "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.\n",
+    "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.",
     "inputs": [
       {
         "name": "blueprint-file",
@@ -714,7 +714,7 @@
     "category": "utilities",
     "subcategory": null,
     "name": "Update Major Tag",
-    "description": "After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.\n",
+    "description": "After tagging a new semver release (e.g. v1.2.3), update the major (v1) and minor (v1.2) floating tags so users pinning to @v1 always get the latest v1.x release.",
     "inputs": [
       {
         "name": "tag",
@@ -742,7 +742,7 @@
     "category": "utilities",
     "subcategory": null,
     "name": "Upsert PR Comment",
-    "description": "Post a new PR comment, update an existing one (matched by prefix), or delete it.\n",
+    "description": "Post a new PR comment, update an existing one (matched by prefix), or delete it.",
     "inputs": [
       {
         "name": "token",
