@@ -36,7 +36,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
     - if: inputs.setup == 'just'
-      uses: ./utilities/setup-just
+      uses: elpic/actions/utilities/setup-just@v1
     - uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.app-name }}-build

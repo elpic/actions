@@ -33,7 +33,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
     - if: inputs.setup == 'just'
-      uses: ./utilities/setup-just
+      uses: elpic/actions/utilities/setup-just@v1
 
     - name: Download main branch coverage
       id: download-main-coverage
