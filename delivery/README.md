@@ -7,8 +7,40 @@ Composite actions for release and publishing workflows.
 | Registry | Actions |
 |----------|---------|
 | [`docker/`](docker/) | [publish](docker/publish/) — Build and push Docker images |
+| [`github-release/`](github-release/) | [build](github-release/build/), [publish](github-release/publish/) — Build and publish GitHub Releases |
 | [`pages/`](pages/) | [publish](pages/publish/) — Build and deploy to GitHub Pages |
 | [`python/`](python/) | [build](python/build/), [publish](python/publish/) — PyPI, GitHub Packages, or JFrog |
+
+### GitHub Release (tag push)
+
+```yaml
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: elpic/actions/delivery/github-release/build@v1
+        with:
+          app-name: myapp
+
+  publish:
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: elpic/actions/delivery/github-release/publish@v1
+        with:
+          app-name: myapp
+```
 
 ## Examples by registry
 

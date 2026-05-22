@@ -1,0 +1,27 @@
+name: GitHub Release Publish
+description: Download the build artifact and create a GitHub Release
+
+inputs:
+  app-name:
+    description: Application name; used to download the correct artifact
+    required: true
+  build-output:
+    description: Directory where the built artifact was extracted
+    required: false
+    default: dist
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+    - uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.app-name }}-dist
+        path: ${{ inputs.build-output }}
+    - uses: softprops/action-gh-release@v3
+      with:
+        token: ${{ github.token }}
+        files: ${{ inputs.build-output }}/*
+        generate_release_notes: true
