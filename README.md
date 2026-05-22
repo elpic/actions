@@ -75,7 +75,7 @@ jobs:
 | [`integration/`](integration/) | PR checks — test, lint, build, security | [Go](integration/go/), [Node](integration/node/), [Python](integration/python/) |
 | [`delivery/`](delivery/) | Release and publish packages | [Docker](delivery/docker/), [GitHub Release](delivery/github-release/), [Pages](delivery/pages/), [Python](delivery/python/) |
 | [`github/`](github/) | GitHub-specific utilities | [blueprint-check](github/blueprint-check/) |
-| [`utilities/`](utilities/) | General-purpose composites | [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
+| [`utilities/`](utilities/) | General-purpose composites | [setup-just](utilities/setup-just/), [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
 
 ## Full list of actions
 
@@ -102,6 +102,7 @@ jobs:
 | `delivery/python/build` | Build Python wheel + upload artifact |
 | `delivery/python/publish` | Publish to PyPI, GitHub Packages, or JFrog |
 | `github/blueprint-check` | PR drift detection for blueprint templates |
+| `utilities/setup-just` | Install the just command runner |
 | `utilities/setup-mise` | Checkout + mise install in one step |
 | `utilities/update-major-tag` | Move floating tags after release |
 | `utilities/upsert-pr-comment` | Post/update/delete PR comments |
