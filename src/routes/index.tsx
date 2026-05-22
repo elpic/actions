@@ -12,8 +12,6 @@ import {
   Shield,
   Zap,
   Layers,
-  Box,
-  FileCode,
 } from "lucide-react";
 import { ACTIONS } from "@/lib/actions-data";
 
