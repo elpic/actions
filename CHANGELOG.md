@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/elpic/actions/compare/v1.5.0...v1.5.1) (2026-05-23)
+
+
+### Bug Fixes
+
+* add --repo flag to gh pr merge in auto-merge workflow ([4aaf3a7](https://github.com/elpic/actions/commit/4aaf3a70e42e2ab101ccc7ecb87d1f9889dd8a6f))
+* remove invalid timeout-minutes and clean duplicated case in go/test ([5c1ed19](https://github.com/elpic/actions/commit/5c1ed190d310cea4ebf9c410b57152c8acfc98cf))
+
 ## [1.5.0](https://github.com/elpic/actions/compare/v1.4.0...v1.5.0) (2026-05-23)
 
 
