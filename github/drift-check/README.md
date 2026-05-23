@@ -1,4 +1,4 @@
-# Blueprint Check
+# Drift Check
 
 Run `blueprint check` on a PR. Posts a drift comment when detected, removes it when resolved.
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: elpic/actions/github/blueprint-check@v1
+      - uses: elpic/actions/github/drift-check@v1
         with:
           blueprint-file: setup.bp
           template: .
