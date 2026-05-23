@@ -62,7 +62,7 @@ runs:
       shell: bash
       run: |
         case "${{ inputs.setup }}" in
-          bash|*) ${{ inputs.test-task }} ;;
+          bash) ${{ inputs.test-task }} ;;
           mise) mise run ${{ inputs.test-coverage-task }} ;;
           node) npm run ${{ inputs.test-task }} ;;
           just) just ${{ inputs.test-task }} ;;
@@ -73,7 +73,7 @@ runs:
       shell: bash
       run: |
         case "${{ inputs.setup }}" in
-          bash|*) ${{ inputs.test-coverage-task }} ;;
+          bash) ${{ inputs.test-coverage-task }} ;;
           mise) mise run ${{ inputs.test-coverage-task }} ;;
           node) npm run ${{ inputs.test-coverage-task }} ;;
           just) just ${{ inputs.test-coverage-task }} ;;
