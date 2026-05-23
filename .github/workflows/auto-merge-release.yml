@@ -5,7 +5,7 @@ name: Auto-merge Release
 
 on:
   pull_request:
-    types: [labeled]
+    types: [opened, labeled]
 
 permissions:
   contents: write
