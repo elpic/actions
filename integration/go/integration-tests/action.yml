@@ -53,7 +53,7 @@ runs:
       run: |
         chmod +x ${{ inputs.app-name }}-*
         case "${{ inputs.setup }}" in
-          bash|*) ${{ inputs.integration-task }} ;;
+          bash) ${{ inputs.integration-task }} ;;
           mise) mise run ${{ inputs.integration-task }} ;;
           node) npm run ${{ inputs.integration-task }} ;;
           just) just ${{ inputs.integration-task }} ;;
