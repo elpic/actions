@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/elpic/actions/compare/v1.5.1...v1.5.2) (2026-05-23)
+
+
+### Bug Fixes
+
+* bash|*) wildcard catches all setup values, making mise/node/just unreachable ([6bfb17e](https://github.com/elpic/actions/commit/6bfb17edf11f0b97f564e7060403031d9bf0349f))
+
 ## [1.5.1](https://github.com/elpic/actions/compare/v1.5.0...v1.5.1) (2026-05-23)
 
 
