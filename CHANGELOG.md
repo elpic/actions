@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/elpic/actions/compare/v1.5.2...v1.5.3) (2026-05-23)
+
+
+### Bug Fixes
+
+* add opened trigger for auto-merge workflow ([bebed17](https://github.com/elpic/actions/commit/bebed1788d7b3fa788ec363863195aa55fa6bff2))
+
 ## [1.5.2](https://github.com/elpic/actions/compare/v1.5.1...v1.5.2) (2026-05-23)
 
 
