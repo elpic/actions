@@ -17,7 +17,8 @@ jobs:
     steps:
       - name: Enable auto-merge
         if: "contains(github.event.pull_request.labels.*.name, 'autorelease: pending')"
-        run: gh pr merge "$NUMBER" --auto --squash
+        run: gh pr merge "$NUMBER" --repo "$REPO" --auto --squash
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
