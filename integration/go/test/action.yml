@@ -54,14 +54,9 @@ runs:
         case "${{ inputs.setup }}" in
           bash|*) ${{ inputs.test-coverage-task }} ;;
           mise) mise run ${{ inputs.test-coverage-task }} ;;
-          node) npm run ${{ inputs.test-coverage-task }} ;;
-          bash|*) ${{ inputs.test-coverage-task }} ;;
-          mise) mise run ${{ inputs.test-coverage-task }} ;;
-          mise) mise run ${{ inputs.test-coverage-task }} ;;
-          node) npm run ${{ inputs.test-coverage-task }} ;;
+          node)  npm run ${{ inputs.test-coverage-task }} ;;
+          just)  just ${{ inputs.test-coverage-task }} ;;
         esac
-      timeout-minutes: ${{ inputs.timeout-minutes }}
-
     - name: Upload coverage artifact
       if: hashFiles('coverage.out') != ''
       uses: actions/upload-artifact@v4
