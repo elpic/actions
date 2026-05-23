@@ -204,11 +204,11 @@
     ]
   },
   {
-    "slug": "github-blueprint-check",
-    "path": "github/blueprint-check",
+    "slug": "github-drift-check",
+    "path": "github/drift-check",
     "category": "github",
     "subcategory": null,
-    "name": "Blueprint Drift Check",
+    "name": "Drift Check",
     "description": "Run blueprint check on a PR and post a comment if drift is detected. Automatically removes the comment when drift is resolved.",
     "inputs": [
       {
