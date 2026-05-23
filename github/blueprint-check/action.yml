@@ -21,7 +21,11 @@ runs:
 
     - name: Install blueprint
       shell: bash
-      run: curl -fsSL https://install.getbp.dev | sh
+      run: |
+        if ! command -v blueprint &>/dev/null; then
+          curl -sL "https://github.com/elpic/blueprint/releases/latest/download/blueprint-linux-amd64" -o /usr/local/bin/blueprint
+          chmod +x /usr/local/bin/blueprint
+        fi
 
     - name: Run blueprint check
       id: check
