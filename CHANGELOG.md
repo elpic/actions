@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/elpic/actions/compare/v1.5.3...v2.0.0) (2026-05-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* Action path changes from github/blueprint-check to github/drift-check.
+
+### Bug Fixes
+
+* rename github/blueprint-check to github/drift-check ([331eb89](https://github.com/elpic/actions/commit/331eb89a5309b6ed70999f7cd200ea333376c157))
+
 ## [1.5.3](https://github.com/elpic/actions/compare/v1.5.2...v1.5.3) (2026-05-23)
 
 
