@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/elpic/actions/compare/v1.4.0...v1.5.0) (2026-05-23)
+
+
+### Features
+
+* add auto-merge workflow for release-please PRs ([#25](https://github.com/elpic/actions/issues/25)) ([512ee04](https://github.com/elpic/actions/commit/512ee04c08af9d3458cdc7e0b3b672f65600c302))
+
 ## [1.4.0](https://github.com/elpic/actions/compare/v1.3.0...v1.4.0) (2026-05-22)
 
 
