@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/elpic/actions/compare/v2.0.0...v2.1.0) (2026-06-12)
+
+
+### Features
+
+* add docker-mirror utility action ([7f48e83](https://github.com/elpic/actions/commit/7f48e83ec4ad0b8484140ab9e5b3c33007315b6c))
+
 ## [2.0.0](https://github.com/elpic/actions/compare/v1.5.3...v2.0.0) (2026-05-23)
 
 
