@@ -1,0 +1,136 @@
+name: Mirror Docker Image
+description: >
+  Mirror a Docker image from a source registry (e.g. Docker Hub) to a mirror
+  registry (default: GHCR). On first use the image is pulled from the source
+  and pushed to the mirror. On subsequent runs the image is pulled from the
+  mirror and retagged under the original source name — so compose files and
+  scripts can keep referencing the original tag without hitting rate limits.
+
+inputs:
+  source:
+    description: >
+      Source image reference including tag (e.g. mockoon/cli:9.6.1,
+      postgres:16, quay.io/prometheus/node-exporter:v1.7.0).
+      If no tag is provided, :latest is assumed.
+    required: true
+
+  target:
+    description: >
+      Target image reference in the mirror registry. If not provided, one is
+      auto-generated from the source and repository owner.
+      Example: ghcr.io/myorg/mockoon-cli:9.6.1
+    required: false
+    default: ""
+
+  github_token:
+    description: >
+      GitHub token with packages:write permission to authenticate with the
+      GitHub Container Registry.
+    required: true
+
+  dockerhub_username:
+    description: >
+      Docker Hub username for authenticated pulls (optional). Authenticated
+      pulls have a higher rate limit (200 pulls/6h vs 100/6h anonymous).
+    required: false
+    default: ""
+
+  dockerhub_token:
+    description: >
+      Docker Hub token or password for authenticated pulls.
+    required: false
+    default: ""
+
+  force:
+    description: >
+      If true, always pull from the source and re-push to the mirror, even
+      if the image already exists in the mirror registry. Useful for mutable
+      tags like :latest.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    # ── Login ──────────────────────────────────────────────────────────
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github_token }}
+
+    - name: Log in to Docker Hub (authenticated pulls)
+      if: inputs.dockerhub_username != '' && inputs.dockerhub_token != ''
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.dockerhub_username }}
+        password: ${{ inputs.dockerhub_token }}
+
+    # ── Resolve target image reference ─────────────────────────────────
+
+    - name: Determine target image reference
+      id: target
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.target }}" ]; then
+          echo "value=${{ inputs.target }}" >> "$GITHUB_OUTPUT"
+        else
+          SOURCE="${{ inputs.source }}"
+          # The tag is the last colon-separated token that does NOT contain
+          # a '/' — this distinguishes it from a registry port (e.g. localhost:5000/).
+          TAG="${SOURCE##*:}"
+          if [[ "$TAG" == */* ]]; then
+            # Colon was a registry port, not a tag separator
+            NAME="$SOURCE"
+            TAG="latest"
+          elif [ "$TAG" = "$SOURCE" ]; then
+            # No colon at all
+            NAME="$SOURCE"
+            TAG="latest"
+          else
+            # Last colon is the tag separator
+            NAME="${SOURCE%:*}"
+          fi
+          # Sanitize: replace '/' with '-' for the GHCR image name
+          SAFE_NAME=$(echo "$NAME" | tr '/' '-')
+          echo "value=ghcr.io/${{ github.repository_owner }}/${SAFE_NAME}:${TAG}" >> "$GITHUB_OUTPUT"
+        fi
+
+    # ── Try existing mirror ────────────────────────────────────────────
+
+    - name: Try to pull from mirror
+      if: inputs.force != 'true'
+      id: pull_mirror
+      shell: bash
+      run: docker pull ${{ steps.target.outputs.value }}
+      continue-on-error: true
+
+    # ── Mirror from source ─────────────────────────────────────────────
+
+    - name: Mirror image from source registry
+      if: inputs.force == 'true' || steps.pull_mirror.outcome == 'failure'
+      shell: bash
+      env:
+        SOURCE: ${{ inputs.source }}
+        TARGET: ${{ steps.target.outputs.value }}
+      run: |
+        echo "Pulling ${SOURCE} from source registry..."
+        docker pull "${SOURCE}"
+        echo "Tagging as ${TARGET}..."
+        docker tag "${SOURCE}" "${TARGET}"
+        echo "Pushing ${TARGET} to mirror registry..."
+        docker push "${TARGET}"
+
+    # ── Retag mirror image as source (only when pulled from mirror) ────
+
+    - name: Retag mirror image as source reference
+      if: steps.pull_mirror.outcome == 'success'
+      shell: bash
+      env:
+        SOURCE: ${{ inputs.source }}
+        TARGET: ${{ steps.target.outputs.value }}
+      run: |
+        docker tag "${TARGET}" "${SOURCE}"
+        echo "Image ${TARGET} retagged as ${SOURCE}"
