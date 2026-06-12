@@ -1,6 +1,6 @@
 # Validates output correctness for all tag combinations.
 
-name: generate-oci-tags
+name: Generate OCI Tags
 
 on:
   pull_request:
