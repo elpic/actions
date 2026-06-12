@@ -1,0 +1,74 @@
+name: Test Upsert PR Comment
+description: Creates, updates, and deletes a comment on the triggering PR.
+
+runs:
+  using: composite
+  steps:
+    # ── Test: Create a comment ────────────────────────────────────────
+    - name: Create test comment
+      uses: ./utilities/upsert-pr-comment
+      with:
+        comment-prefix: "## Test Comment (setup-just)"
+        comment-body: |
+          ## Test Comment (setup-just)
+          This comment was created by the integration test.
+          It should be updated in the next step.
+
+    - name: Verify comment was created
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+          --jq '.[] | select(.body | startswith("## Test Comment (setup-just)")) | .id')
+        if [ -z "$COMMENT_ID" ]; then
+          echo "FAIL: comment was not created"
+          exit 1
+        fi
+        echo "✅ upsert-pr-comment: comment created (ID: $COMMENT_ID)"
+
+    # ── Test: Update the comment ──────────────────────────────────────
+    - name: Update test comment
+      uses: ./utilities/upsert-pr-comment
+      with:
+        comment-prefix: "## Test Comment (setup-just)"
+        comment-body: |
+          ## Test Comment (setup-just)
+          This comment was UPDATED by the integration test.
+          It should be deleted in the next step.
+
+    - name: Verify comment was updated
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+          --jq '.[] | select(.body | startswith("## Test Comment (setup-just)")) | .body')
+        if [[ "$COMMENT_BODY" != *"UPDATED"* ]]; then
+          echo "FAIL: comment was not updated"
+          exit 1
+        fi
+        echo "✅ upsert-pr-comment: comment updated"
+
+    # ── Test: Delete the comment ──────────────────────────────────────
+    - name: Delete test comment
+      uses: ./utilities/upsert-pr-comment
+      with:
+        comment-prefix: "## Test Comment (setup-just)"
+        action: delete
+
+    - name: Verify comment was deleted
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+          --jq '.[] | select(.body | startswith("## Test Comment (setup-just)")) | .id')
+        if [ -n "$COMMENT_ID" ]; then
+          echo "FAIL: comment was not deleted (ID: $COMMENT_ID)"
+          exit 1
+        fi
+        echo "✅ upsert-pr-comment: comment deleted"

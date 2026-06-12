@@ -1,6 +1,5 @@
 # Integration checks for the actions repository itself.
-# Validates that all action.yml files are syntactically correct
-# and that README.md files follow the expected template.
+# Validates structure, runs utility tests, and coordinates integration tests.
 
 name: Integration
 
@@ -15,6 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ── Structural validation ─────────────────────────────────────────
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -75,3 +75,50 @@ jobs:
             exit 1
           fi
           echo "All actions have a README.md."
+
+  # ── Utility: generate-oci-tags ───────────────────────────────────
+  test-generate-oci-tags:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tests/utilities/test-generate-oci-tags
+
+  # ── Utility: setup-just ──────────────────────────────────────────
+  test-setup-just:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tests/utilities/test-setup-just
+
+  # ── Utility: setup-mise ──────────────────────────────────────────
+  test-setup-mise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tests/utilities/test-setup-mise
+
+  # ── Utility: docker-mirror ───────────────────────────────────────
+  test-docker-mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tests/utilities/test-docker-mirror
+
+  # ── Utility: upsert-pr-comment ───────────────────────────────────
+  test-upsert-pr-comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      pull-requests: write
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./tests/utilities/test-upsert-pr-comment

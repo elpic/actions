@@ -1,0 +1,27 @@
+name: Test Setup Just
+description: Verifies that just is installed and callable.
+
+runs:
+  using: composite
+  steps:
+    - name: Run setup-just
+      uses: ./utilities/setup-just
+
+    - name: Verify just is installed
+      shell: bash
+      run: |
+        echo "just version: $(just --version 2>&1)"
+        command -v just >/dev/null || { echo "FAIL: just not found"; exit 1; }
+        echo "✅ setup-just: just is installed and callable"
+
+    - name: Verify just can run a task
+      shell: bash
+      run: |
+        # Create a temporary justfile and run it
+        TMPDIR=$(mktemp -d)
+        cd "$TMPDIR"
+        echo 'test-task:
+          echo "hello from just"' > justfile
+        RESULT=$(just test-task)
+        [[ "$RESULT" == "hello from just" ]] || { echo "FAIL: 'just test-task' returned '$RESULT'"; exit 1; }
+        echo "✅ setup-just: just can execute tasks"

@@ -1,0 +1,24 @@
+name: Test Setup Mise
+description: Verifies that mise is installed and can install a tool.
+
+runs:
+  using: composite
+  steps:
+    - name: Run setup-mise
+      uses: ./utilities/setup-mise
+
+    - name: Verify mise is installed
+      shell: bash
+      run: |
+        echo "mise version: $(mise version 2>&1)"
+        command -v mise >/dev/null || { echo "FAIL: mise not found"; exit 1; }
+        echo "✅ setup-mise: mise is installed and callable"
+
+    - name: Verify mise can install a tool
+      shell: bash
+      run: |
+        # Install a small, fast tool to test mise works end-to-end
+        mise install shellcheck@0.10.0
+        VERSION=$(mise x shellcheck@0.10.0 -- shellcheck --version | head -1)
+        [[ "$VERSION" == "ShellCheck"* ]] || { echo "FAIL: shellcheck not installed correctly"; exit 1; }
+        echo "✅ setup-mise: mise can install and run tools"

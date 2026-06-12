@@ -1,0 +1,41 @@
+name: Test Mirror Docker Image
+description: Verifies that a small image can be mirrored from Docker Hub to GHCR.
+
+runs:
+  using: composite
+  steps:
+    - name: Mirror hello-world image
+      uses: ./utilities/docker-mirror
+      with:
+        source: hello-world:latest
+        github_token: ${{ github.token }}
+
+    - name: Verify image is available under source name
+      shell: bash
+      run: |
+        docker image inspect hello-world:latest > /dev/null 2>&1 || {
+          echo "FAIL: hello-world:latest not found locally after mirror"
+          exit 1
+        }
+        echo "✅ docker-mirror: image available as hello-world:latest"
+
+    - name: Verify image is also in GHCR
+      shell: bash
+      run: |
+        TARGET="ghcr.io/${{ github.repository_owner }}/hello-world:latest"
+        docker image inspect "$TARGET" > /dev/null 2>&1 || {
+          echo "FAIL: $TARGET not found locally after mirror"
+          exit 1
+        }
+        echo "✅ docker-mirror: image available as $TARGET"
+
+    - name: Verify image runs correctly
+      shell: bash
+      run: |
+        OUTPUT=$(docker run --rm hello-world:latest 2>&1)
+        [[ "$OUTPUT" == *"Hello from Docker!"* ]] || {
+          echo "FAIL: mirrored image doesn't run correctly"
+          echo "Output: $OUTPUT"
+          exit 1
+        }
+        echo "✅ docker-mirror: mirrored image runs correctly"
