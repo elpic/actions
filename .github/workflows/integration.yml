@@ -49,7 +49,7 @@ jobs:
               echo "  ERROR: runs.using must be 'composite', got '$using'"
               errors=$((errors + 1))
             fi
-          done < <(find . -name 'action.yml' -print0)
+          done < <(find . -name 'action.yml' -not -path './.github/workflows/tests/*' -print0)
 
           if [ "$errors" -gt 0 ]; then
             echo "---"
@@ -68,7 +68,7 @@ jobs:
               echo "ERROR: $dir has action.yml but no README.md"
               errors=$((errors + 1))
             fi
-          done < <(find . -name 'action.yml' -print0)
+          done < <(find . -name 'action.yml' -not -path './.github/workflows/tests/*' -print0)
 
           if [ "$errors" -gt 0 ]; then
             echo "Found $errors action(s) missing README.md"
