@@ -82,7 +82,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: ./tests/utilities/test-generate-oci-tags
+      - uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
 
   # ── Utility: setup-just ──────────────────────────────────────────
   test-setup-just:
@@ -90,7 +90,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: ./tests/utilities/test-setup-just
+      - uses: ./.github/workflows/tests/utilities/test-setup-just
 
   # ── Utility: setup-mise ──────────────────────────────────────────
   test-setup-mise:
@@ -98,7 +98,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - uses: ./tests/utilities/test-setup-mise
+      - uses: ./.github/workflows/tests/utilities/test-setup-mise
 
   # ── Utility: docker-mirror ───────────────────────────────────────
   test-docker-mirror:
@@ -109,7 +109,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
-      - uses: ./tests/utilities/test-docker-mirror
+      - uses: ./.github/workflows/tests/utilities/test-docker-mirror
 
   # ── Utility: upsert-pr-comment ───────────────────────────────────
   test-upsert-pr-comment:
@@ -121,4 +121,4 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v6
-      - uses: ./tests/utilities/test-upsert-pr-comment
+      - uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
