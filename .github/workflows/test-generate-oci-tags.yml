@@ -1,0 +1,237 @@
+# Self-test for the generate-oci-tags action.
+# Validates output correctness for all tag combinations.
+
+name: Test generate-oci-tags
+
+on:
+  pull_request:
+    paths:
+      - 'utilities/generate-oci-tags/**'
+      - 'delivery/docker/publish/**'
+  push:
+    branches: [main]
+    paths:
+      - 'utilities/generate-oci-tags/**'
+      - 'delivery/docker/publish/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      # ── Test 1: Full semver release ──────────────────────────────────
+      - name: Test 1 — version v1.2.3 with all expected tags
+        id: t1
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          version: v1.2.3
+
+      - name: Verify Test 1
+        shell: bash
+        run: |
+          echo "tags:       ${{ steps.t1.outputs.tags }}"
+          echo "tag-list:   ${{ steps.t1.outputs.tag-list }}"
+          echo "sha-tag:    ${{ steps.t1.outputs.sha-tag }}"
+          echo "branch-tag: ${{ steps.t1.outputs.branch-tag }}"
+          echo "version:    ${{ steps.t1.outputs.version-tag }}"
+          echo "major:      ${{ steps.t1.outputs.version-major }}"
+          echo "minor:      ${{ steps.t1.outputs.version-minor }}"
+          echo "latest:     ${{ steps.t1.outputs.latest-tag }}"
+
+          # Version outputs
+          [[ "${{ steps.t1.outputs.version-tag }}"    == "v1.2.3" ]] || { echo "FAIL: version-tag"; exit 1; }
+          [[ "${{ steps.t1.outputs.version-major }}"  == "v1"     ]] || { echo "FAIL: version-major"; exit 1; }
+          [[ "${{ steps.t1.outputs.version-minor }}"  == "v1.2"   ]] || { echo "FAIL: version-minor"; exit 1; }
+
+          # Non-version outputs present
+          [[ -n "${{ steps.t1.outputs.sha-tag }}"    ]] || { echo "FAIL: sha-tag empty"; exit 1; }
+          [[ -n "${{ steps.t1.outputs.branch-tag }}" ]] || { echo "FAIL: branch-tag empty"; exit 1; }
+
+          # Latest included
+          [[ "${{ steps.t1.outputs.latest-tag }}" == "latest" ]] || { echo "FAIL: latest-tag missing"; exit 1; }
+
+          # Full tags contain all expected references
+          TAGS="${{ steps.t1.outputs.tags }}"
+          [[ "$TAGS" == *":v1.2.3"*  ]] || { echo "FAIL: tags missing v1.2.3"; exit 1; }
+          [[ "$TAGS" == *":v1.2"*    ]] || { echo "FAIL: tags missing v1.2"; exit 1; }
+          [[ "$TAGS" == *":v1"*      ]] || { echo "FAIL: tags missing v1"; exit 1; }
+          [[ "$TAGS" == *":latest"*  ]] || { echo "FAIL: tags missing latest"; exit 1; }
+          echo "✅ Test 1 passed"
+
+      # ── Test 2: No version (SHA + branch only) ───────────────────────
+      - name: Test 2 — no version, only sha and branch
+        id: t2
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+
+      - name: Verify Test 2
+        shell: bash
+        run: |
+          # No version outputs
+          [[ "${{ steps.t2.outputs.version-tag }}"   == "" ]] || { echo "FAIL: version-tag should be empty"; exit 1; }
+          [[ "${{ steps.t2.outputs.version-major }}" == "" ]] || { echo "FAIL: version-major should be empty"; exit 1; }
+          [[ "${{ steps.t2.outputs.version-minor }}" == "" ]] || { echo "FAIL: version-minor should be empty"; exit 1; }
+
+          # Non-version present
+          [[ -n "${{ steps.t2.outputs.sha-tag }}"    ]] || { echo "FAIL: sha-tag empty"; exit 1; }
+
+          # Latest included by default
+          [[ "${{ steps.t2.outputs.latest-tag }}" == "latest" ]] || { echo "FAIL: latest-tag missing"; exit 1; }
+          echo "✅ Test 2 passed"
+
+      # ── Test 3: Pre-release (no latest) ──────────────────────────────
+      - name: Test 3 — pre-release v2.0.0-rc.1 should skip latest
+        id: t3
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          version: v2.0.0-rc.1
+
+      - name: Verify Test 3
+        shell: bash
+        run: |
+          TAGS="${{ steps.t3.outputs.tags }}"
+          TL="${{ steps.t3.outputs.tag-list }}"
+
+          # Version tag present
+          [[ "${{ steps.t3.outputs.version-tag }}" == "v2.0.0-rc.1" ]] || { echo "FAIL: version-tag"; exit 1; }
+          [[ "${{ steps.t3.outputs.version-major }}" == "v2" ]] || { echo "FAIL: version-major"; exit 1; }
+
+          # Latest MUST NOT be present
+          [[ "$TAGS" != *":latest"* ]] || { echo "FAIL: latest should not be present for pre-release"; exit 1; }
+          [[ "${{ steps.t3.outputs.latest-tag }}" == "" ]] || { echo "FAIL: latest-tag output should be empty"; exit 1; }
+
+          echo "✅ Test 3 passed"
+
+      # ── Test 4: Additional tags ──────────────────────────────────────
+      - name: Test 4 — additional-tags input
+        id: t4
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          version: v1.0.0
+          additional-tags: stable,prod
+
+      - name: Verify Test 4
+        shell: bash
+        run: |
+          TAGS="${{ steps.t4.outputs.tags }}"
+          [[ "$TAGS" == *":stable"* ]] || { echo "FAIL: missing stable tag"; exit 1; }
+          [[ "$TAGS" == *":prod"*   ]] || { echo "FAIL: missing prod tag"; exit 1; }
+          echo "✅ Test 4 passed"
+
+      # ── Test 5: include-latest disabled ──────────────────────────────
+      - name: Test 5 — include-latest false
+        id: t5
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          include-latest: false
+
+      - name: Verify Test 5
+        shell: bash
+        run: |
+          TAGS="${{ steps.t5.outputs.tags }}"
+          [[ "$TAGS" != *":latest"* ]] || { echo "FAIL: latest should not be present"; exit 1; }
+          [[ "${{ steps.t5.outputs.latest-tag }}" == "" ]] || { echo "FAIL: latest-tag should be empty"; exit 1; }
+          echo "✅ Test 5 passed"
+
+      # ── Test 6: Version without v prefix ─────────────────────────────
+      - name: Test 6 — semver without v prefix
+        id: t6
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          version: 1.2.3
+
+      - name: Verify Test 6
+        shell: bash
+        run: |
+          [[ "${{ steps.t6.outputs.version-tag }}"   == "1.2.3" ]] || { echo "FAIL: version-tag"; exit 1; }
+          [[ "${{ steps.t6.outputs.version-major }}" == "1"     ]] || { echo "FAIL: version-major"; exit 1; }
+          [[ "${{ steps.t6.outputs.version-minor }}" == "1.2"   ]] || { echo "FAIL: version-minor"; exit 1; }
+          echo "✅ Test 6 passed"
+
+      # ── Test 7: Branch sanitization ──────────────────────────────────
+      - name: Test 7 — branch name sanitization
+        id: t7
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          branch: feature/MY_BRANCH/name
+
+      - name: Verify Test 7
+        shell: bash
+        run: |
+          [[ "${{ steps.t7.outputs.branch-tag }}" == "feature-my_branch-name" ]] || {
+            echo "FAIL: branch-tag is '${{ steps.t7.outputs.branch-tag }}' expected 'feature-my_branch-name'"
+            exit 1
+          }
+          echo "✅ Test 7 passed"
+
+      # ── Test 8: Custom sha length ────────────────────────────────────
+      - name: Test 8 — custom sha-length
+        id: t8
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: ghcr.io
+          image: myapp
+          sha: abcdef1234567890
+          sha-length: 12
+
+      - name: Verify Test 8
+        shell: bash
+        run: |
+          [[ "${{ steps.t8.outputs.sha-tag }}" == "abcdef123456" ]] || {
+            echo "FAIL: sha-tag is '${{ steps.t8.outputs.sha-tag }}' expected 'abcdef123456'"
+            exit 1
+          }
+          echo "✅ Test 8 passed"
+
+      # ── Test 9: Full output format ───────────────────────────────────
+      - name: Test 9 — full tags output format
+        id: t9
+        uses: ./utilities/generate-oci-tags
+        with:
+          registry: docker.io
+          image: library/nginx
+          version: 1.25.0
+          include-latest: true
+
+      - name: Verify Test 9
+        shell: bash
+        run: |
+          TAGS="${{ steps.t9.outputs.tags }}"
+          TL="${{ steps.t9.outputs.tag-list }}"
+
+          # Full references use registry/image:tag format
+          [[ "$TAGS" == "docker.io/library/nginx:1.25.0"* ]] || { echo "FAIL: tags should start with registry/image"; exit 1; }
+
+          # Comma separated, no spaces
+          [[ "$TAGS" != *" "* ]] || { echo "FAIL: tags should not contain spaces"; exit 1; }
+
+          # Tag list has same number of entries
+          TAGS_COUNT=$(echo "$TAGS" | tr ',' '\n' | wc -l | xargs)
+          TL_COUNT=$(echo "$TL" | tr ',' '\n' | wc -l | xargs)
+          [[ "$TAGS_COUNT" == "$TL_COUNT" ]] || {
+            echo "FAIL: tags count ($TAGS_COUNT) != tag-list count ($TL_COUNT)"
+            exit 1
+          }
+          echo "Tags: $TAGS"
+          echo "Tag list: $TL"
+          echo "✅ Test 9 passed"
