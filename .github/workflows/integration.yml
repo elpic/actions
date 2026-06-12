@@ -76,49 +76,30 @@ jobs:
           fi
           echo "All actions have a README.md."
 
-  # ── Utility: generate-oci-tags ───────────────────────────────────
-  test-generate-oci-tags:
+  # ── Utility tests ────────────────────────────────────────────────
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
-
-  # ── Utility: setup-just ──────────────────────────────────────────
-  test-setup-just:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/workflows/tests/utilities/test-setup-just
-
-  # ── Utility: setup-mise ──────────────────────────────────────────
-  test-setup-mise:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/workflows/tests/utilities/test-setup-mise
-
-  # ── Utility: docker-mirror ───────────────────────────────────────
-  test-docker-mirror:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     permissions:
-      packages: write
       contents: read
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/workflows/tests/utilities/test-docker-mirror
-
-  # ── Utility: upsert-pr-comment ───────────────────────────────────
-  test-upsert-pr-comment:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
+      packages: write
       issues: write
       pull-requests: write
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
+
+      # ── Generate OCI Tags ──────────────────────────────────────────
+      - uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
+
+      # ── Setup Just ─────────────────────────────────────────────────
+      - uses: ./.github/workflows/tests/utilities/test-setup-just
+
+      # ── Setup Mise ─────────────────────────────────────────────────
+      - uses: ./.github/workflows/tests/utilities/test-setup-mise
+
+      # ── Mirror Docker Image ────────────────────────────────────────
+      - uses: ./.github/workflows/tests/utilities/test-docker-mirror
+
+      # ── Upsert PR Comment (PR only) ────────────────────────────────
+      - if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
