@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/elpic/actions/compare/v2.1.0...v2.2.0) (2026-06-12)
+
+
+### Features
+
+* add generate-oci-tags utility action ([3c0eb90](https://github.com/elpic/actions/commit/3c0eb907cadf23f18984446fc098009677eb02f8))
+
 ## [2.1.0](https://github.com/elpic/actions/compare/v2.0.0...v2.1.0) (2026-06-12)
 
 
