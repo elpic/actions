@@ -75,7 +75,7 @@ jobs:
 | [`integration/`](integration/) | PR checks — test, lint, build, security | [Go](integration/go/), [Node](integration/node/), [Python](integration/python/) |
 | [`delivery/`](delivery/) | Release and publish packages | [Docker](delivery/docker/), [GitHub Release](delivery/github-release/), [Pages](delivery/pages/), [Python](delivery/python/) |
 | [`github/`](github/) | GitHub-specific utilities | [drift-check](github/drift-check/) |
-| [`utilities/`](utilities/) | General-purpose composites | [docker-mirror](utilities/docker-mirror/), [setup-just](utilities/setup-just/), [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
+| [`utilities/`](utilities/) | General-purpose composites | [docker-mirror](utilities/docker-mirror/), [generate-oci-tags](utilities/generate-oci-tags/), [setup-just](utilities/setup-just/), [setup-mise](utilities/setup-mise/), [update-major-tag](utilities/update-major-tag/), [upsert-pr-comment](utilities/upsert-pr-comment/) |
 
 ## Full list of actions
 
@@ -103,6 +103,7 @@ jobs:
 | `delivery/python/publish` | Publish to PyPI, GitHub Packages, or JFrog |
 | `github/drift-check` | PR drift detection for blueprint templates |
 | `utilities/docker-mirror` | Mirror a Docker image to GHCR to avoid rate limits |
+| `utilities/generate-oci-tags` | Generate OCI-compliant Docker image tags |
 | `utilities/setup-just` | Install the just command runner |
 | `utilities/setup-mise` | Checkout + mise install in one step |
 | `utilities/update-major-tag` | Move floating tags after release |

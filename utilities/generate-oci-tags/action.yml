@@ -1,0 +1,176 @@
+name: Generate OCI Tags
+description: >
+  Generate OCI-compliant Docker image tags (semver, commit SHA, branch, latest)
+  in a format ready for docker/build-push-action or docker tag + push.
+  Supports semver version parsing, branch sanitization, and pre-release detection.
+
+inputs:
+  registry:
+    description: Container registry URL (e.g. ghcr.io, docker.io)
+    required: true
+  image:
+    description: Image name (e.g. myapp, org/myapp)
+    required: true
+  version:
+    description: >
+      Semver version string (e.g. v1.2.3 or 1.2.3). Generates tags for the
+      full version, major.minor, and major. Pre-release versions (e.g. v2.0.0-rc.1)
+      skip the latest tag per Docker convention.
+    required: false
+    default: ""
+  sha:
+    description: Full commit SHA
+    required: false
+    default: ${{ github.sha }}
+  sha-length:
+    description: Number of characters to use for the short SHA tag
+    required: false
+    default: "7"
+  branch:
+    description: Git branch or tag name
+    required: false
+    default: ${{ github.ref_name }}
+  additional-tags:
+    description: Comma-separated list of extra tags to append
+    required: false
+    default: ""
+  include-latest:
+    description: Include the latest tag (automatically skipped for pre-releases)
+    required: false
+    default: "true"
+
+outputs:
+  tags:
+    description: >
+      Comma-separated full image references — ready for docker/build-push-action
+      (e.g. ghcr.io/org/app:v1.2.3,ghcr.io/org/app:v1.2,ghcr.io/org/app:v1,...)
+  tag-list:
+    description: Comma-separated tag values only (e.g. v1.2.3,v1.2,v1,abc1234,main,latest)
+  sha-tag:
+    description: Short commit SHA tag (e.g. abc1234)
+  branch-tag:
+    description: Sanitized branch name (e.g. main, feature-my-x)
+  version-tag:
+    description: Full version tag (only if version input is provided)
+  version-major:
+    description: Major version tag (only if version input is provided)
+  version-minor:
+    description: Minor version tag (only if version input is provided, only if the version contains a minor segment)
+  latest-tag:
+    description: Set to "latest" when include-latest is true and version is not a pre-release
+
+runs:
+  using: composite
+  steps:
+    - name: Generate OCI tags
+      id: tags
+      shell: bash
+      env:
+        REGISTRY: ${{ inputs.registry }}
+        IMAGE: ${{ inputs.image }}
+        VERSION: ${{ inputs.version }}
+        SHA: ${{ inputs.sha }}
+        SHA_LENGTH: ${{ inputs.sha-length }}
+        BRANCH: ${{ inputs.branch }}
+        ADDITIONAL: ${{ inputs.additional-tags }}
+        INCLUDE_LATEST: ${{ inputs.include-latest }}
+      run: |
+        # ── Helpers ──────────────────────────────────────────────────────
+
+        # Append a tag to both the full reference list and the tag-only list
+        append_tag() {
+          local tag="$1"
+          if [ -n "$TAGS" ]; then
+            TAGS="${TAGS},"
+            TAG_LIST="${TAG_LIST},"
+          fi
+          TAGS="${TAGS}${REGISTRY}/${IMAGE}:${tag}"
+          TAG_LIST="${TAG_LIST}${tag}"
+        }
+
+        TAGS=""
+        TAG_LIST=""
+
+        # ── Short SHA ────────────────────────────────────────────────────
+
+        SHORT_SHA="${SHA:0:SHA_LENGTH}"
+        append_tag "${SHORT_SHA}"
+        echo "sha-tag=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+        # ── Sanitized branch ─────────────────────────────────────────────
+
+        SAFE_BRANCH=$(echo "${BRANCH}" \
+          | tr '[:upper:]' '[:lower:]' \
+          | tr '/' '-' \
+          | tr '_' '-')
+        append_tag "${SAFE_BRANCH}"
+        echo "branch-tag=${SAFE_BRANCH}" >> "$GITHUB_OUTPUT"
+
+        # ── Semver tags ──────────────────────────────────────────────────
+
+        IS_PRERELEASE="false"
+
+        if [ -n "$VERSION" ]; then
+          # Strip 'v' prefix for parsing
+          CLEAN="${VERSION#v}"
+
+          # Detect pre-release (contains hyphen after the version)
+          case "$CLEAN" in
+            *-*) IS_PRERELEASE="true" ;;
+          esac
+
+          # Extract major
+          MAJOR="${CLEAN%%.*}"
+          REMAINDER="${CLEAN#*.}"
+
+          # Extract minor if it exists
+          if [ "$REMAINDER" != "$CLEAN" ]; then
+            MINOR="${REMAINDER%%.*}"
+            HAS_MINOR="true"
+          else
+            MINOR=""
+            HAS_MINOR="false"
+          fi
+
+          # Preserve the original version prefix (v or empty)
+          VERSION_PREFIX="${VERSION%"${CLEAN}"}"
+
+          # Generate semver tags: full version, major.minor, major
+          append_tag "${VERSION}"
+
+          if [ "$HAS_MINOR" = "true" ]; then
+            # Only add major.minor if it differs from the full version
+            if [ "${MAJOR}.${MINOR}" != "${CLEAN}" ]; then
+              append_tag "${VERSION_PREFIX}${MAJOR}.${MINOR}"
+            fi
+            echo "version-minor=${VERSION_PREFIX}${MAJOR}.${MINOR}" >> "$GITHUB_OUTPUT"
+          fi
+
+          append_tag "${VERSION_PREFIX}${MAJOR}"
+
+          # Output individual version components
+          echo "version-tag=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version-major=${VERSION_PREFIX}${MAJOR}" >> "$GITHUB_OUTPUT"
+        fi
+
+        # ── Additional tags ──────────────────────────────────────────────
+
+        if [ -n "$ADDITIONAL" ]; then
+          IFS=',' read -ra ADD <<< "$ADDITIONAL"
+          for tag in "${ADD[@]}"; do
+            tag=$(echo "$tag" | xargs)  # trim whitespace
+            append_tag "$tag"
+          done
+        fi
+
+        # ── Latest tag ────────────────────────────────────────────────────
+
+        if [ "$INCLUDE_LATEST" = "true" ] && [ "$IS_PRERELEASE" != "true" ]; then
+          append_tag "latest"
+          echo "latest-tag=latest" >> "$GITHUB_OUTPUT"
+        fi
+
+        # ── Final outputs ────────────────────────────────────────────────
+
+        echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+        echo "tag-list=${TAG_LIST}" >> "$GITHUB_OUTPUT"
