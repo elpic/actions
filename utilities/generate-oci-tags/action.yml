@@ -44,20 +44,28 @@ outputs:
     description: >
       Comma-separated full image references — ready for docker/build-push-action
       (e.g. ghcr.io/org/app:v1.2.3,ghcr.io/org/app:v1.2,ghcr.io/org/app:v1,...)
+    value: ${{ steps.tags.outputs.tags }}
   tag-list:
     description: Comma-separated tag values only (e.g. v1.2.3,v1.2,v1,abc1234,main,latest)
+    value: ${{ steps.tags.outputs.tag-list }}
   sha-tag:
     description: Short commit SHA tag (e.g. abc1234)
+    value: ${{ steps.tags.outputs.sha-tag }}
   branch-tag:
     description: Sanitized branch name (e.g. main, feature-my-x)
+    value: ${{ steps.tags.outputs.branch-tag }}
   version-tag:
     description: Full version tag (only if version input is provided)
+    value: ${{ steps.tags.outputs.version-tag }}
   version-major:
     description: Major version tag (only if version input is provided)
+    value: ${{ steps.tags.outputs.version-major }}
   version-minor:
     description: Minor version tag (only if version input is provided, only if the version contains a minor segment)
+    value: ${{ steps.tags.outputs.version-minor }}
   latest-tag:
     description: Set to "latest" when include-latest is true and version is not a pre-release
+    value: ${{ steps.tags.outputs.latest-tag }}
 
 runs:
   using: composite

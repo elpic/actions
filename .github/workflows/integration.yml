@@ -77,7 +77,7 @@ jobs:
           echo "All actions have a README.md."
 
   # ── Utility tests ────────────────────────────────────────────────
-  test:
+  Tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
