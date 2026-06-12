@@ -41,24 +41,11 @@ runs:
 
     - name: Generate tags
       id: tags
-      shell: bash
-      run: |
-        SHA_TAG="${{ github.sha }}"
-        BRANCH_TAG="${{ github.ref_name }}"
-        LATEST_TAG="latest"
-        REGISTRY="${{ inputs.registry }}"
-        IMAGE="${{ inputs.app-name }}"
-
-        TAGS="${REGISTRY}/${IMAGE}:${SHA_TAG},${REGISTRY}/${IMAGE}:${BRANCH_TAG},${REGISTRY}/${IMAGE}:${LATEST_TAG}"
-
-        if [ -n "${{ inputs.additional-tags }}" ]; then
-          IFS=',' read -ra ADD <<< "${{ inputs.additional-tags }}"
-          for tag in "${ADD[@]}"; do
-            TAGS="${TAGS},${REGISTRY}/${IMAGE}:${tag}"
-          done
-        fi
-
-        echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+      uses: elpic/actions/utilities/generate-oci-tags@v1
+      with:
+        registry: ${{ inputs.registry }}
+        image: ${{ inputs.app-name }}
+        additional-tags: ${{ inputs.additional-tags }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
