@@ -684,6 +684,52 @@
     ]
   },
   {
+    "slug": "utilities-docker-mirror",
+    "path": "utilities/docker-mirror",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Mirror Docker Image",
+    "description": "Mirror a Docker image from a source registry (e.g. Docker Hub) to a mirror registry (default: GHCR), avoiding rate limits by reusing the mirrored copy on later runs.",
+    "inputs": [
+      {
+        "name": "source",
+        "description": "Source image reference including tag (e.g. mockoon/cli:9.6.1, postgres:16). If no tag is provided, :latest is assumed.",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "target",
+        "description": "Target image reference in the mirror registry. If not provided, one is auto-generated from the source and repository owner.",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "github_token",
+        "description": "GitHub token with packages:write permission to authenticate with the GitHub Container Registry.",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "dockerhub_username",
+        "description": "Docker Hub username for authenticated pulls (optional). Authenticated pulls have a higher rate limit.",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "dockerhub_token",
+        "description": "Docker Hub token or password for authenticated pulls.",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "force",
+        "description": "If true, always pull from the source and re-push to the mirror, even if the image already exists. Useful for mutable tags like :latest.",
+        "required": false,
+        "default": "false"
+      }
+    ]
+  },
+  {
     "slug": "utilities-setup-just",
     "path": "utilities/setup-just",
     "category": "utilities",
