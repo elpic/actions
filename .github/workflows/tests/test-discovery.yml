@@ -1,0 +1,12 @@
+name: Test Subdirectory Discovery
+on:
+  push:
+    branches:
+      - 'feat/**'
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Workflow was discovered in .github/workflows/tests/"
+        shell: bash
