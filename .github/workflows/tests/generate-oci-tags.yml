@@ -1,7 +1,6 @@
-# Self-test for the generate-oci-tags action.
 # Validates output correctness for all tag combinations.
 
-name: Test generate-oci-tags
+name: generate-oci-tags
 
 on:
   pull_request:
