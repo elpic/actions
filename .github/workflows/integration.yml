@@ -16,6 +16,7 @@ concurrency:
 jobs:
   # ── Structural validation ─────────────────────────────────────────
   validate:
+    name: Validate
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
