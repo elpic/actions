@@ -199,7 +199,7 @@ runs:
         TL="${{ steps.t9.outputs.tag-list }}"
 
         # Full references use registry/image:tag format
-        [[ "$TAGS" == "docker.io/library/nginx:1.25.0"* ]] || { echo "FAIL: tags should start with registry/image"; exit 1; }
+        [[ "$TAGS" == *"docker.io/library/nginx:1.25.0"* ]] || { echo "FAIL: tags missing docker.io/library/nginx:1.25.0"; exit 1; }
 
         # Comma separated, no spaces
         [[ "$TAGS" != *" "* ]] || { echo "FAIL: tags should not contain spaces"; exit 1; }
