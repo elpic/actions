@@ -730,6 +730,64 @@
     ]
   },
   {
+    "slug": "utilities-generate-oci-tags",
+    "path": "utilities/generate-oci-tags",
+    "category": "utilities",
+    "subcategory": null,
+    "name": "Generate OCI Tags",
+    "description": "Generate OCI-compliant Docker image tags (semver, commit SHA, branch, latest) in a format ready for docker/build-push-action or docker tag + push. Supports semver version parsing, branch sanitization, and pre-release detection.",
+    "inputs": [
+      {
+        "name": "registry",
+        "description": "Container registry URL (e.g. ghcr.io, docker.io)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "image",
+        "description": "Image name (e.g. myapp, org/myapp)",
+        "required": true,
+        "default": null
+      },
+      {
+        "name": "version",
+        "description": "Semver version string (e.g. v1.2.3 or 1.2.3). Generates tags for the full version, major.minor, and major. Pre-release versions (e.g. v2.0.0-rc.1) skip the latest tag per Docker convention.",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "sha",
+        "description": "Full commit SHA",
+        "required": false,
+        "default": "${{ github.sha }}"
+      },
+      {
+        "name": "sha-length",
+        "description": "Number of characters to use for the short SHA tag",
+        "required": false,
+        "default": "7"
+      },
+      {
+        "name": "branch",
+        "description": "Git branch or tag name",
+        "required": false,
+        "default": "${{ github.ref_name }}"
+      },
+      {
+        "name": "additional-tags",
+        "description": "Comma-separated list of extra tags to append",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "include-latest",
+        "description": "Include the latest tag (automatically skipped for pre-releases)",
+        "required": false,
+        "default": "true"
+      }
+    ]
+  },
+  {
     "slug": "utilities-setup-just",
     "path": "utilities/setup-just",
     "category": "utilities",
