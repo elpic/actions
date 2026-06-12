@@ -157,8 +157,8 @@ runs:
     - name: Verify Test 7
       shell: bash
       run: |
-        [[ "${{ steps.t7.outputs.branch-tag }}" == "feature-my_branch-name" ]] || {
-          echo "FAIL: branch-tag is '${{ steps.t7.outputs.branch-tag }}' expected 'feature-my_branch-name'"
+        [[ "${{ steps.t7.outputs.branch-tag }}" == "feature-my-branch-name" ]] || {
+          echo "FAIL: branch-tag is '${{ steps.t7.outputs.branch-tag }}' expected 'feature-my-branch-name'"
           exit 1
         }
         echo "✅ Test 7 passed"
