@@ -1,11 +1,29 @@
 name: Setup Just
 description: Install the just command runner (https://just.systems)
 
+inputs:
+  version:
+    description: Version of just to install (e.g. v1.36.0). Defaults to latest.
+    required: false
+    default: "latest"
+
 runs:
   using: composite
   steps:
     - shell: bash
       run: |
         if ! command -v just &>/dev/null; then
-          curl -fsSL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | sudo tar xz -C /usr/local/bin just
+          ARCH=$(uname -m)
+
+          if [ "${{ inputs.version }}" = "latest" ]; then
+            TAG=$(curl -fsL "https://api.github.com/repos/casey/just/releases/latest" | jq -r '.tag_name')
+          else
+            TAG="${{ inputs.version }}"
+          fi
+
+          VERSION="${TAG#v}"
+          URL="https://github.com/casey/just/releases/download/${TAG}/just-${VERSION}-${ARCH}-unknown-linux-musl.tar.gz"
+
+          echo "Downloading just ${TAG} for ${ARCH}..."
+          curl -fsSL "$URL" | sudo tar xz -C /usr/local/bin just
         fi

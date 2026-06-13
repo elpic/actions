@@ -1,6 +1,5 @@
 # Integration checks for the actions repository itself.
-# Validates that all action.yml files are syntactically correct
-# and that README.md files follow the expected template.
+# Validates structure, runs utility tests, and coordinates integration tests.
 
 name: Integration
 
@@ -15,7 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ── Structural validation ─────────────────────────────────────────
   validate:
+    name: Validate
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -49,7 +50,7 @@ jobs:
               echo "  ERROR: runs.using must be 'composite', got '$using'"
               errors=$((errors + 1))
             fi
-          done < <(find . -name 'action.yml' -print0)
+          done < <(find . -name 'action.yml' -not -path './.github/workflows/tests/*' -print0)
 
           if [ "$errors" -gt 0 ]; then
             echo "---"
@@ -68,10 +69,85 @@ jobs:
               echo "ERROR: $dir has action.yml but no README.md"
               errors=$((errors + 1))
             fi
-          done < <(find . -name 'action.yml' -print0)
+          done < <(find . -name 'action.yml' -not -path './.github/workflows/tests/*' -print0)
 
           if [ "$errors" -gt 0 ]; then
             echo "Found $errors action(s) missing README.md"
             exit 1
           fi
           echo "All actions have a README.md."
+
+  # ── Utility tests ────────────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      # ── Generate OCI Tags ──────────────────────────────────────────
+      - id: test_generate_oci_tags
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
+
+      # ── Setup Just ─────────────────────────────────────────────────
+      - id: test_setup_just
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-setup-just
+
+      # ── Setup Mise ─────────────────────────────────────────────────
+      - id: test_setup_mise
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-setup-mise
+
+      # ── Mirror Docker Image ────────────────────────────────────────
+      - id: test_docker_mirror
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-docker-mirror
+
+      # ── Upsert PR Comment (PR only) ────────────────────────────────
+      - id: test_upsert_pr_comment
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
+
+      # ── Report results ─────────────────────────────────────────────
+      - name: Report results
+        if: always()
+        shell: bash
+        run: |
+          failed=0
+
+          echo "=== Test Results ==="
+
+          inspect() {
+            local name="$1" outcome="$2"
+            if [ "$outcome" = "success" ]; then
+              echo "  ✅ $name"
+            else
+              echo "  ❌ $name"
+              failed=1
+            fi
+          }
+
+          inspect "Generate OCI Tags"  "${{ steps.test_generate_oci_tags.outcome }}"
+          inspect "Setup Just"         "${{ steps.test_setup_just.outcome }}"
+          inspect "Setup Mise"         "${{ steps.test_setup_mise.outcome }}"
+          inspect "Mirror Docker Image" "${{ steps.test_docker_mirror.outcome }}"
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            inspect "Upsert PR Comment" "${{ steps.test_upsert_pr_comment.outcome }}"
+          fi
+
+          echo "==================="
+
+          if [ "$failed" -eq 1 ]; then
+            echo "❌ Some tests failed"
+            exit 1
+          fi
+          echo "✅ All tests passed"
