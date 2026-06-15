@@ -6,56 +6,16 @@ name: Integration
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'utilities/**'
-      - 'delivery/**'
-      - '.github/workflows/**'
   push:
     branches: [main]
-    paths:
-      - 'utilities/**'
-      - 'delivery/**'
-      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ── Detect which files changed ────────────────────────────────────
-  changes:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-    outputs:
-      oci_tags: ${{ steps.filter.outputs.oci_tags }}
-      setup_just: ${{ steps.filter.outputs.setup_just }}
-      setup_mise: ${{ steps.filter.outputs.setup_mise }}
-      docker_mirror: ${{ steps.filter.outputs.docker_mirror }}
-      upsert_pr_comment: ${{ steps.filter.outputs.upsert_pr_comment }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            oci_tags:
-              - 'utilities/generate-oci-tags/**'
-            setup_just:
-              - 'utilities/setup-just/**'
-            setup_mise:
-              - 'utilities/setup-mise/**'
-            docker_mirror:
-              - 'utilities/docker-mirror/**'
-            upsert_pr_comment:
-              - 'utilities/upsert-pr-comment/**'
-
   # ── Structural validation ─────────────────────────────────────────
   validate:
-    needs: changes
     name: Validate
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -119,7 +79,6 @@ jobs:
 
   # ── Utility tests ────────────────────────────────────────────────
   test:
-    needs: changes
     name: Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -133,31 +92,27 @@ jobs:
 
       # ── Generate OCI Tags ──────────────────────────────────────────
       - id: test_generate_oci_tags
-        if: needs.changes.outputs.oci_tags == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
 
       # ── Setup Just ─────────────────────────────────────────────────
       - id: test_setup_just
-        if: needs.changes.outputs.setup_just == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-setup-just
 
       # ── Setup Mise ─────────────────────────────────────────────────
       - id: test_setup_mise
-        if: needs.changes.outputs.setup_mise == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-setup-mise
 
       # ── Mirror Docker Image ────────────────────────────────────────
       - id: test_docker_mirror
-        if: needs.changes.outputs.docker_mirror == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-docker-mirror
 
       # ── Upsert PR Comment (PR only) ────────────────────────────────
       - id: test_upsert_pr_comment
-        if: needs.changes.outputs.upsert_pr_comment == 'true' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
 
@@ -172,11 +127,12 @@ jobs:
 
           inspect() {
             local name="$1" outcome="$2"
-            case "$outcome" in
-              success) echo "  ✅ $name" ;;
-              skipped) echo "  ⏭️  $name" ;;
-              *)       echo "  ❌ $name"; failed=1 ;;
-            esac
+            if [ "$outcome" = "success" ]; then
+              echo "  ✅ $name"
+            else
+              echo "  ❌ $name"
+              failed=1
+            fi
           }
 
           inspect "Generate OCI Tags"  "${{ steps.test_generate_oci_tags.outcome }}"
