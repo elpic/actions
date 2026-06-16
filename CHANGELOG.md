@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/elpic/actions/compare/v2.2.0...v2.3.0) (2026-06-15)
+
+
+### Features
+
+* run tests only when associated files change ([fe3481c](https://github.com/elpic/actions/commit/fe3481cda699a8af9fbccdaaf20aad5ca3929118))
+
 ## [2.2.0](https://github.com/elpic/actions/compare/v2.1.0...v2.2.0) (2026-06-12)
 
 
