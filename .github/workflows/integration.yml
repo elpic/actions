@@ -6,8 +6,16 @@ name: Integration
 on:
   pull_request:
     branches: [main]
+    paths:
+      - 'utilities/**'
+      - 'delivery/**'
+      - '.github/workflows/**'
   push:
     branches: [main]
+    paths:
+      - 'utilities/**'
+      - 'delivery/**'
+      - '.github/workflows/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -89,30 +97,52 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # ── Detect which files changed ─────────────────────────────────
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            oci_tags:
+              - 'utilities/generate-oci-tags/**'
+            setup_just:
+              - 'utilities/setup-just/**'
+            setup_mise:
+              - 'utilities/setup-mise/**'
+            docker_mirror:
+              - 'utilities/docker-mirror/**'
+            upsert_pr_comment:
+              - 'utilities/upsert-pr-comment/**'
 
       # ── Generate OCI Tags ──────────────────────────────────────────
       - id: test_generate_oci_tags
+        if: steps.filter.outputs.oci_tags == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-generate-oci-tags
 
       # ── Setup Just ─────────────────────────────────────────────────
       - id: test_setup_just
+        if: steps.filter.outputs.setup_just == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-setup-just
 
       # ── Setup Mise ─────────────────────────────────────────────────
       - id: test_setup_mise
+        if: steps.filter.outputs.setup_mise == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-setup-mise
 
       # ── Mirror Docker Image ────────────────────────────────────────
       - id: test_docker_mirror
+        if: steps.filter.outputs.docker_mirror == 'true'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-docker-mirror
 
       # ── Upsert PR Comment (PR only) ────────────────────────────────
       - id: test_upsert_pr_comment
-        if: github.event_name == 'pull_request'
+        if: steps.filter.outputs.upsert_pr_comment == 'true' && github.event_name == 'pull_request'
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
 
@@ -127,12 +157,11 @@ jobs:
 
           inspect() {
             local name="$1" outcome="$2"
-            if [ "$outcome" = "success" ]; then
-              echo "  ✅ $name"
-            else
-              echo "  ❌ $name"
-              failed=1
-            fi
+            case "$outcome" in
+              success) echo "  ✅ $name" ;;
+              skipped) echo "  ⏭️  $name" ;;
+              *)       echo "  ❌ $name"; failed=1 ;;
+            esac
           }
 
           inspect "Generate OCI Tags"  "${{ steps.test_generate_oci_tags.outcome }}"
