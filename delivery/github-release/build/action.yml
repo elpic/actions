@@ -14,7 +14,7 @@ inputs:
     required: false
     default: dist
   working-directory:
-    description: Working directory relative to repo root (default: repo root)
+    description: 'Working directory relative to repo root (default: repo root)'
     required: false
     default: .
 

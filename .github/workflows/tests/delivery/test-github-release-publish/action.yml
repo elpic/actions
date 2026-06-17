@@ -46,7 +46,7 @@ runs:
         GH_TOKEN: ${{ github.token }}
       run: |
         TAG="${{ env.TAG }}"
-        RELEASE_INFO=$(gh release view "$TAG" --json name,draft,tagName,isDraft 2>&1) || {
+        RELEASE_INFO=$(gh release view "$TAG" --json name,tagName,isDraft 2>&1) || {
           echo "FAIL: could not find release for tag $TAG"
           echo "Output: $RELEASE_INFO"
           exit 1
