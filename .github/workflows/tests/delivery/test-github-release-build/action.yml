@@ -1,58 +1,62 @@
 name: Test GitHub Release Build
-description: Verifies that mise can run a build task and artifact upload works.
+description: Calls the actual delivery/github-release/build action with a minimal fixture.
 
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-
-    - uses: jdx/mise-action@v2
-
-    - name: Create minimal project and build
+    - name: Create test fixture project
       shell: bash
       run: |
-        TMPDIR=$(mktemp -d)
-        export BUILD_OUTPUT="$TMPDIR/dist"
-        mkdir -p "$BUILD_OUTPUT"
-        cd "$TMPDIR"
+        FIXTURE=".test-fixtures/github-release-build"
+        rm -rf "$FIXTURE"
+        mkdir -p "$FIXTURE"
 
-        # Create a simple build script
-        cat > build.sh << 'SCRIPT'
+        # mise.toml — defines the build task the action will call
+        cat > "$FIXTURE/mise.toml" << 'EOF'
+        [tasks.build]
+        run = "bash build.sh"
+        EOF
+
+        # Build script that produces output matching build-output default (dist/)
+        cat > "$FIXTURE/build.sh" << 'SCRIPT'
         #!/usr/bin/env bash
-        echo "Building test-app..."
+        set -euo pipefail
         mkdir -p dist
         echo "#!/usr/bin/env bash" > dist/test-app
         echo 'echo "Hello from test-app v0.1.0"' >> dist/test-app
         chmod +x dist/test-app
         SCRIPT
-        chmod +x build.sh
 
-        # ── Run build ──────────────────────────────────────────────────
-        bash build.sh
+        echo "✅ Test fixture created at $FIXTURE"
 
-        # ── Verify output ──────────────────────────────────────────────
-        if [ ! -f "$BUILD_OUTPUT/test-app" ]; then
-          echo "FAIL: build output not found at $BUILD_OUTPUT/test-app"
+    # Call the actual github-release/build action
+    - uses: ./delivery/github-release/build
+      with:
+        app-name: test-app
+        working-directory: .test-fixtures/github-release-build
+
+    - name: Verify build output
+      shell: bash
+      run: |
+        OUTPUT_FILE=".test-fixtures/github-release-build/dist/test-app"
+        if [ ! -f "$OUTPUT_FILE" ]; then
+          echo "FAIL: build output not found at $OUTPUT_FILE"
+          ls -la .test-fixtures/github-release-build/dist/ 2>/dev/null || echo "  dist/ does not exist"
           exit 1
         fi
 
-        OUTPUT=$(bash "$BUILD_OUTPUT/test-app")
+        OUTPUT=$(bash "$OUTPUT_FILE")
         if [ "$OUTPUT" != "Hello from test-app v0.1.0" ]; then
           echo "FAIL: unexpected output: '$OUTPUT'"
           exit 1
         fi
 
         echo "✅ github-release/build: build output created and verified"
-        echo "BUILD_OUTPUT=$BUILD_OUTPUT" >> "$GITHUB_ENV"
+        echo "   Output: $OUTPUT"
 
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-app-dist
-        path: ${{ env.BUILD_OUTPUT }}
-
-    - name: Verify artifact upload metadata
+    - name: Cleanup fixture
+      if: always()
       shell: bash
       run: |
-        echo "✅ github-release/build: artifact uploaded as 'test-app-dist'"
-        echo "   Contains: test-app"
+        rm -rf .test-fixtures
+        echo "✅ Cleanup complete"

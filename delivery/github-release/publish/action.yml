@@ -9,6 +9,16 @@ inputs:
     description: Directory where the built artifact was extracted
     required: false
     default: dist
+  draft:
+    description: Create a draft release instead of publishing immediately
+    required: false
+    default: "false"
+  tag-name:
+    description: >
+      Tag to create a release for (default: inferred from github.ref).
+      Useful for testing or creating releases for specific tags.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -25,3 +35,5 @@ runs:
         token: ${{ github.token }}
         files: ${{ inputs.build-output }}/*
         generate_release_notes: true
+        draft: ${{ inputs.draft == 'true' }}
+        tag_name: ${{ inputs.tag-name || github.ref }}

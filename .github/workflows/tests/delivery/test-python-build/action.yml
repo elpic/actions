@@ -1,23 +1,24 @@
 name: Test Python Build
-description: Verifies that a Python package can be built using mise and python -m build.
+description: Calls the actual delivery/python/build action with a minimal fixture project.
 
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-
-    - uses: jdx/mise-action@v2
-
-    - name: Create minimal test project, build, and verify
+    - name: Create test fixture project
       shell: bash
       run: |
-        TMPDIR=$(mktemp -d)
-        PROJECT="$TMPDIR/project"
-        mkdir -p "$PROJECT/src/test_package"
-        cd "$PROJECT"
+        FIXTURE=".test-fixtures/python-build"
+        rm -rf "$FIXTURE"
+        mkdir -p "$FIXTURE/src/test_package"
 
-        # ── Fixture: minimal Python project ────────────────────────────
-        cat > pyproject.toml << 'EOF'
+        # mise.toml — defines the build task the action will call
+        cat > "$FIXTURE/mise.toml" << 'EOF'
+        [tasks.build]
+        run = "python -m build"
+        EOF
+
+        # pyproject.toml
+        cat > "$FIXTURE/pyproject.toml" << 'EOF'
         [build-system]
         requires = ["setuptools>=68.0", "wheel"]
         build-backend = "setuptools.build_meta"
@@ -29,11 +30,11 @@ runs:
         requires-python = ">=3.9"
         EOF
 
-        cat > src/test_package/__init__.py << 'EOF'
+        cat > "$FIXTURE/src/test_package/__init__.py" << 'EOF'
         __version__ = "0.1.0"
         EOF
 
-        cat > setup.cfg << 'EOF'
+        cat > "$FIXTURE/setup.cfg" << 'EOF'
         [metadata]
         name = test-package
         version = 0.1.0
@@ -44,22 +45,26 @@ runs:
         packages = find:
         EOF
 
-        # ── Build ──────────────────────────────────────────────────────
-        pip install build --quiet
-        python -m build --quiet
+        echo "✅ Test fixture created at $FIXTURE"
 
-        WHEEL=$(ls dist/*.whl 2>/dev/null | head -1)
-        SRCDIST=$(ls dist/*.tar.gz 2>/dev/null | head -1)
+    # Call the actual python/build action with working-directory pointing to our fixture
+    - uses: ./delivery/python/build
+      with:
+        app-name: test-package
+        working-directory: .test-fixtures/python-build
 
+    - name: Verify build output
+      shell: bash
+      run: |
+        WHEEL=$(ls .test-fixtures/python-build/dist/*.whl 2>/dev/null | head -1)
         if [ -z "$WHEEL" ]; then
-          echo "FAIL: no .whl file was created"
-          ls -la dist/ 2>/dev/null || echo "dist/ does not exist"
+          echo "FAIL: no .whl file found in .test-fixtures/python-build/dist/"
+          ls -la .test-fixtures/python-build/dist/ 2>/dev/null || echo "  dist/ does not exist"
           exit 1
         fi
         echo "✅ python/build: wheel created → $(basename "$WHEEL")"
-        echo "   source dist → $(basename "$SRCDIST")"
 
-        # ── Verify installable ─────────────────────────────────────────
+        # Verify the wheel can be installed
         pip install "$WHEEL" --quiet
         python -c "
 import test_package
@@ -69,3 +74,10 @@ print('✅ python/build: package installs and imports correctly')
           echo "FAIL: package failed to install or import"
           exit 1
         }
+
+    - name: Cleanup fixture
+      if: always()
+      shell: bash
+      run: |
+        rm -rf .test-fixtures
+        echo "✅ Cleanup complete"

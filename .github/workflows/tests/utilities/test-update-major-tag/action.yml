@@ -1,145 +1,75 @@
 name: Test Update Major Tag
-description: Validates the semver parsing and floating tag logic in a sandboxed git repo.
+description: Validates the update-major-tag action end-to-end in dry-run mode.
 
 runs:
   using: composite
   steps:
-    # Setup: create a sandboxed git repo with known tags
-    - name: Setup sandbox git repo
+    # ── Setup: create test tags ────────────────────────────────────────
+    - name: Create test tag
       shell: bash
       run: |
-        SANDBOX=$(mktemp -d)
-        cd "$SANDBOX"
-        git init
         git config user.email "test@test.com"
         git config user.name "Test"
+        git tag v999999.0.0
+        echo "✅ Test tag v999999.0.0 created"
 
-        # Create a commit
-        echo "hello" > file.txt
-        git add file.txt
-        git commit -m "initial commit"
+    # ── Test 1: Default (update-minor: true) ──────────────────────────
+    - name: Test 1 — update-minor true creates both major and minor tags
+      uses: ./utilities/update-major-tag
+      with:
+        tag: v999999.0.0
+        update-minor: "true"
+        dry-run: "true"
 
-        # Tag it as a release
-        git tag v1.2.3
-
-        echo "SANDBOX=$SANDBOX" >> "$GITHUB_ENV"
-
-    # ── Test 1: Semver validation (valid tag) ──────────────────────────
-    - name: Test 1 — valid semver v1.2.3 creates v1 and v1.2 tags
+    - name: Verify Test 1
       shell: bash
       run: |
-        cd "$SANDBOX"
-
-        TAG="v1.2.3"
-        TAG="${TAG#v}"
-
-        # Validate semver
-        echo "$TAG" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || {
-          echo "FAIL: semver validation rejected valid tag '$TAG'"
-          exit 1
-        }
-
-        MAJOR=$(echo "$TAG" | cut -d. -f1)
-        MINOR=$(echo "$TAG" | cut -d. -f2)
-
-        # Create floating tags
-        git tag -f "v${MAJOR}" HEAD
-        git tag -f "v${MAJOR}.${MINOR}" HEAD
-
-        # Verify tags exist and point to HEAD
-        TAG_HASH=$(git rev-parse HEAD)
-        MAJOR_HASH=$(git rev-parse "v${MAJOR}")
-        MINOR_HASH=$(git rev-parse "v${MAJOR}.${MINOR}")
-
-        [[ "$MAJOR_HASH" == "$TAG_HASH" ]] || {
-          echo "FAIL: v${MAJOR} points to $MAJOR_HASH, expected $TAG_HASH"
-          exit 1
-        }
-        [[ "$MINOR_HASH" == "$TAG_HASH" ]] || {
-          echo "FAIL: v${MAJOR}.${MINOR} points to $MINOR_HASH, expected $TAG_HASH"
-          exit 1
-        }
-        echo "✅ Test 1 passed: v${MAJOR} and v${MAJOR}.${MINOR} created correctly"
-
-    # ── Test 2: Invalid semver is rejected ─────────────────────────────
-    - name: Test 2 — invalid semver is rejected
-      shell: bash
-      run: |
-        cd "$SANDBOX"
-
-        for BAD_TAG in "v1.2" "v1" "latest" "v1.2.3.4" "v1.2.3-rc1" "abc" "1.2.3.4"; do
-          CHECK="${BAD_TAG#v}"
-          if echo "$CHECK" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "FAIL: '$BAD_TAG' should have been rejected as non-semver"
-            exit 1
-          fi
-        done
-        echo "✅ Test 2 passed: all invalid semver tags correctly rejected"
-
-    # ── Test 3: update-minor=false ────────────────────────────────────
-    - name: Test 3 — update-minor false skips minor tag
-      shell: bash
-      run: |
-        cd "$SANDBOX"
-
-        # Create the next commit and tag
-        echo "world" > file2.txt
-        git add file2.txt
-        git commit -m "second commit"
-
-        TAG="v2.0.0"
-        TAG="${TAG#v}"
-
-        echo "$TAG" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || exit 1
-
-        MAJOR=$(echo "$TAG" | cut -d. -f1)
-        MINOR=$(echo "$TAG" | cut -d. -f2)
-
-        # Only update major tag (update-minor=false)
-        git tag -f "v${MAJOR}" HEAD
-
-        # Minor tag should NOT have been moved
-        MINOR_EXISTS=$(git tag -l "v${MAJOR}.${MINOR}")
-        if [ -n "$MINOR_EXISTS" ]; then
-          # It might exist from a previous test; check what it points to
-          MINOR_HASH=$(git rev-parse "v${MAJOR}.${MINOR}")
-          HEAD_HASH=$(git rev-parse HEAD)
-          if [ "$MINOR_HASH" == "$HEAD_HASH" ]; then
-            echo "FAIL: minor tag should not have been updated when update-minor=false"
-            exit 1
-          fi
-        fi
-        echo "✅ Test 3 passed: minor tag not updated when update-minor=false"
-
-    # ── Test 4: Major tag moves to latest release ──────────────────────
-    - name: Test 4 — major tag floats to latest semver
-      shell: bash
-      run: |
-        cd "$SANDBOX"
-
-        # After Test 3, v2 should point to HEAD (second commit)
-        TAG="v2.0.0"
-        TAG="${TAG#v}"
-        MAJOR=$(echo "$TAG" | cut -d. -f1)
-
-        # Now tag a newer patch on the same major
-        echo "third" > file3.txt
-        git add file3.txt
-        git commit -m "third commit"
-        git tag v2.0.1
-
-        # Re-run the update logic
-        NEW_TAG="v2.0.1"
-        NEW_TAG="${NEW_TAG#v}"
-        echo "$NEW_TAG" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || exit 1
-        MAJOR=$(echo "$NEW_TAG" | cut -d. -f1)
-        git tag -f "v${MAJOR}" HEAD
-
-        # v2 should now point to the third commit
-        V2_HASH=$(git rev-parse "v${MAJOR}")
+        # v999999 should exist
+        MAJOR_HASH=$(git rev-parse v999999)
         HEAD_HASH=$(git rev-parse HEAD)
-        [[ "$V2_HASH" == "$HEAD_HASH" ]] || {
-          echo "FAIL: v${MAJOR} should have moved to latest commit"
+        [[ "$MAJOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999 points to $MAJOR_HASH, expected $HEAD_HASH"
           exit 1
         }
-        echo "✅ Test 4 passed: major tag floats to latest semver"
+        # v999999.0 should exist
+        MINOR_HASH=$(git rev-parse v999999.0)
+        [[ "$MINOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999.0 points to $MINOR_HASH, expected $HEAD_HASH"
+          exit 1
+        }
+        echo "✅ Test 1 passed: both v999999 and v999999.0 created"
+
+    # ── Test 2: update-minor: false ───────────────────────────────────
+    - name: Test 2 — update-minor false skips minor tag
+      uses: ./utilities/update-major-tag
+      with:
+        tag: v999999.1.0
+        update-minor: "false"
+        dry-run: "true"
+
+    - name: Verify Test 2
+      shell: bash
+      run: |
+        # v999999 should have moved to v999999.1.0's HEAD
+        # Create tag v999999.1.0 locally first
+        git tag v999999.1.0
+        HEAD_HASH=$(git rev-parse HEAD)
+        MAJOR_HASH=$(git rev-parse v999999)
+        [[ "$MAJOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999 should have moved to latest commit"
+          exit 1
+        }
+        # v999999.1 should NOT have been created (update-minor=false)
+        if git rev-parse v999999.1 >/dev/null 2>&1; then
+          echo "FAIL: v999999.1 should not exist (update-minor=false)"
+          exit 1
+        fi
+        echo "✅ Test 2 passed: minor tag not created when update-minor=false"
+
+    # ── Cleanup ───────────────────────────────────────────────────────
+    - name: Cleanup test tags
+      if: always()
+      shell: bash
+      run: |
+        git tag -d v999999 v999999.0 v999999.0.0 v999999.1 v999999.1.0 2>/dev/null || true
+        echo "✅ Cleanup complete"

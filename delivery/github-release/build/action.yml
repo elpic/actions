@@ -10,18 +10,25 @@ inputs:
     required: false
     default: build
   build-output:
-    description: Directory containing the built output
+    description: Directory containing the built output (relative to working-directory)
     required: false
     default: dist
+  working-directory:
+    description: Working directory relative to repo root (default: repo root)
+    required: false
+    default: .
 
 runs:
   using: composite
   steps:
     - uses: actions/checkout@v6
+      with:
+        clean: false
     - uses: jdx/mise-action@v2
     - shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: mise run ${{ inputs.build-task }}
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.app-name }}-dist
-        path: ${{ inputs.build-output }}
+        path: ${{ inputs.working-directory }}/${{ inputs.build-output }}

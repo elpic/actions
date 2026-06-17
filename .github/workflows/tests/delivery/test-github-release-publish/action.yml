@@ -1,71 +1,78 @@
 name: Test GitHub Release Publish
-description: Validates the artifact upload/download contract used by the publish action.
+description: Calls the actual delivery/github-release/publish action with a draft release.
 
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-
-    # ── Upload a test artifact (mimics what github-release/build does) ──
-    - name: Create and upload test artifact
+    # ── Setup: create a unique test tag ────────────────────────────────
+    - name: Create test tag
       shell: bash
       run: |
-        TMPDIR=$(mktemp -d)
-        mkdir -p "$TMPDIR/dist"
+        TAG="test-publish-$(date +%s)"
+        git config user.email "test@test.com"
+        git config user.name "Test"
+        git tag "$TAG"
+        git push origin "$TAG"
+        echo "TAG=$TAG" >> "$GITHUB_ENV"
+        echo "✅ Test tag $TAG created and pushed"
 
-        # Create a pretend release artifact
-        echo "#!/usr/bin/env bash" > "$TMPDIR/dist/test-app"
-        echo 'echo "Hello from test-app v0.1.0"' >> "$TMPDIR/dist/test-app"
-        chmod +x "$TMPDIR/dist/test-app"
-
-        # Also add a checksum file
-        sha256sum "$TMPDIR/dist/test-app" > "$TMPDIR/dist/test-app.sha256"
-
-        echo "✅ Test artifact created:"
-        ls -la "$TMPDIR/dist/"
-
-        # Store the artifact content hash for later verification
-        sha256sum "$TMPDIR/dist/test-app" | cut -d' ' -f1 > /tmp/test-artifact-hash
-        echo "ARTIFACT_DIR=$TMPDIR/dist" >> "$GITHUB_ENV"
+    # ── Create and upload a test artifact ──────────────────────────────
+    - name: Create test artifact
+      shell: bash
+      run: |
+        mkdir -p dist
+        echo "#!/usr/bin/env bash" > dist/test-app
+        echo 'echo "Hello from test-app v0.1.0"' >> dist/test-app
+        chmod +x dist/test-app
+        sha256sum dist/test-app > dist/test-app.sha256
+        echo "✅ Test artifact created"
 
     - uses: actions/upload-artifact@v4
       with:
         name: test-app-dist
-        path: ${{ env.ARTIFACT_DIR }}
+        path: dist/
 
-    # ── Download the artifact (mimics the publish action) ──────────────
-    - name: Download artifact (same pattern as github-release/publish)
-      uses: actions/download-artifact@v4
+    # ── Call the actual publish action ─────────────────────────────────
+    - uses: ./delivery/github-release/publish
       with:
-        name: test-app-dist
-        path: dist
+        app-name: test-app
+        tag-name: ${{ env.TAG }}
+        draft: "true"
 
-    - name: Verify downloaded artifact
+    # ── Verify the draft release was created ───────────────────────────
+    - name: Verify draft release
       shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
-        EXPECTED_HASH=$(cat /tmp/test-artifact-hash)
-
-        if [ ! -f "dist/test-app" ]; then
-          echo "FAIL: dist/test-app not found after download"
-          ls -la dist/ 2>/dev/null || echo "dist/ does not exist"
+        TAG="${{ env.TAG }}"
+        RELEASE_INFO=$(gh release view "$TAG" --json name,draft,tagName,isDraft 2>&1) || {
+          echo "FAIL: could not find release for tag $TAG"
+          echo "Output: $RELEASE_INFO"
           exit 1
-        fi
-
-        ACTUAL_HASH=$(sha256sum dist/test-app | cut -d' ' -f1)
-        if [ "$ACTUAL_HASH" != "$EXPECTED_HASH" ]; then
-          echo "FAIL: artifact hash mismatch"
-          echo "  expected: $EXPECTED_HASH"
-          echo "  actual:   $ACTUAL_HASH"
+        }
+        echo "Release info: $RELEASE_INFO"
+        echo "$RELEASE_INFO" | grep -q '"isDraft": true' && {
+          echo "✅ github-release/publish: draft release created successfully"
+        } || {
+          echo "FAIL: release was not created as draft"
           exit 1
-        fi
+        }
 
-        OUTPUT=$(bash dist/test-app)
-        if [ "$OUTPUT" != "Hello from test-app v0.1.0" ]; then
-          echo "FAIL: unexpected output: '$OUTPUT'"
-          exit 1
+    # ── Cleanup: delete the test tag and draft release ─────────────────
+    - name: Cleanup
+      if: always()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        TAG="${{ env.TAG }}"
+        if [ -n "$TAG" ]; then
+          echo "Cleaning up $TAG ..."
+          gh release delete "$TAG" --yes 2>/dev/null || echo "  (no release to delete)"
+          git push origin ":refs/tags/${TAG}" 2>/dev/null || echo "  (no tag to delete)"
+          git tag -d "$TAG" 2>/dev/null || true
+          echo "✅ Cleanup complete"
+        else
+          echo "No tag to clean up"
         fi
-
-        echo "✅ github-release/publish: artifact uploaded and downloaded correctly"
-        echo "   dist/test-app is executable and produces expected output"

@@ -16,6 +16,10 @@ inputs:
     description: Whether to also update the minor tag (e.g. v1.2)
     required: false
     default: "true"
+  dry-run:
+    description: If true, create floating tags locally but skip git push (useful for testing)
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -45,13 +49,21 @@ runs:
         # Update major tag (v1, v2, ...)
         MAJOR_TAG="v${MAJOR}"
         git tag -f "${MAJOR_TAG}" HEAD
-        git push -f origin "${MAJOR_TAG}"
+        if [ "${{ inputs.dry-run }}" != "true" ]; then
+          git push -f origin "${MAJOR_TAG}"
+        else
+          echo "[dry-run] skipping git push for ${MAJOR_TAG}"
+        fi
 
         # Update minor tag (v1.0, v1.2, ...)
         if [ "${{ inputs.update-minor }}" = "true" ]; then
           MINOR_TAG="v${MAJOR}.${MINOR}"
           git tag -f "${MINOR_TAG}" HEAD
-          git push -f origin "${MINOR_TAG}"
+          if [ "${{ inputs.dry-run }}" != "true" ]; then
+            git push -f origin "${MINOR_TAG}"
+          else
+            echo "[dry-run] skipping git push for ${MINOR_TAG}"
+          fi
         fi
 
         echo "Updated ${MAJOR_TAG} → ${TAG}"
