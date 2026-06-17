@@ -47,6 +47,11 @@ runs:
 
         echo "✅ Test fixture created at $FIXTURE"
 
+    # Ensure the build package is available for the action's mise task
+    - name: Install build package
+      shell: bash
+      run: pip install build
+
     # Call the actual python/build action with working-directory pointing to our fixture
     - uses: ./delivery/python/build
       with:
