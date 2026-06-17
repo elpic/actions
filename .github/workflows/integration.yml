@@ -6,10 +6,6 @@ name: Integration
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'utilities/**'
-      - 'delivery/**'
-      - '.github/workflows/**'
   push:
     branches: [main]
     paths:
