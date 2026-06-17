@@ -31,7 +31,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        DEV_BUILD: ${{ github.event_name != 'workflow_dispatch' && needs.release-please.outputs.release_created != 'true' && github.run_number || '' }}
+        DEV_BUILD: ${{ github.event_name != 'workflow_dispatch' && github.run_number || '' }}
         RELEASE_VERSION: ${{ github.event.inputs.version || '' }}
       run: mise run ${{ inputs.build-task }}
 
