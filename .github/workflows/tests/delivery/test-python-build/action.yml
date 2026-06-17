@@ -66,14 +66,16 @@ runs:
 
         # Verify the wheel can be installed
         pip install "$WHEEL" --quiet
-        python -c "
+        python << 'PYEOF'
 import test_package
-assert test_package.__version__ == '0.1.0', f'version mismatch: {test_package.__version__}'
+assert test_package.__version__ == '0.1.0', f"version mismatch: {test_package.__version__}"
 print('✅ python/build: package installs and imports correctly')
-" || {
+PYEOF
+        rc=$?
+        if [ $rc -ne 0 ]; then
           echo "FAIL: package failed to install or import"
           exit 1
-        }
+        fi
 
     - name: Cleanup fixture
       if: always()

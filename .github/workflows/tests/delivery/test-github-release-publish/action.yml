@@ -29,13 +29,13 @@ runs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: test-app-dist
+        name: test-publish-app-dist
         path: dist/
 
     # ── Call the actual publish action ─────────────────────────────────
     - uses: ./delivery/github-release/publish
       with:
-        app-name: test-app
+        app-name: test-publish-app
         tag-name: ${{ env.TAG }}
         draft: "true"
 
