@@ -52,7 +52,7 @@ runs:
           exit 1
         }
         echo "Release info: $RELEASE_INFO"
-        echo "$RELEASE_INFO" | grep -q '"isDraft": true' && {
+        echo "$RELEASE_INFO" | grep -qE '"isDraft": ?true' && {
           echo "✅ github-release/publish: draft release created successfully"
         } || {
           echo "FAIL: release was not created as draft"
