@@ -1,0 +1,58 @@
+name: Test GitHub Release Build
+description: Verifies that mise can run a build task and artifact upload works.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - uses: jdx/mise-action@v2
+
+    - name: Create minimal project and build
+      shell: bash
+      run: |
+        TMPDIR=$(mktemp -d)
+        export BUILD_OUTPUT="$TMPDIR/dist"
+        mkdir -p "$BUILD_OUTPUT"
+        cd "$TMPDIR"
+
+        # Create a simple build script
+        cat > build.sh << 'SCRIPT'
+        #!/usr/bin/env bash
+        echo "Building test-app..."
+        mkdir -p dist
+        echo "#!/usr/bin/env bash" > dist/test-app
+        echo 'echo "Hello from test-app v0.1.0"' >> dist/test-app
+        chmod +x dist/test-app
+        SCRIPT
+        chmod +x build.sh
+
+        # ── Run build ──────────────────────────────────────────────────
+        bash build.sh
+
+        # ── Verify output ──────────────────────────────────────────────
+        if [ ! -f "$BUILD_OUTPUT/test-app" ]; then
+          echo "FAIL: build output not found at $BUILD_OUTPUT/test-app"
+          exit 1
+        fi
+
+        OUTPUT=$(bash "$BUILD_OUTPUT/test-app")
+        if [ "$OUTPUT" != "Hello from test-app v0.1.0" ]; then
+          echo "FAIL: unexpected output: '$OUTPUT'"
+          exit 1
+        fi
+
+        echo "✅ github-release/build: build output created and verified"
+        echo "BUILD_OUTPUT=$BUILD_OUTPUT" >> "$GITHUB_ENV"
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-app-dist
+        path: ${{ env.BUILD_OUTPUT }}
+
+    - name: Verify artifact upload metadata
+      shell: bash
+      run: |
+        echo "✅ github-release/build: artifact uploaded as 'test-app-dist'"
+        echo "   Contains: test-app"
