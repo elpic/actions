@@ -1,6 +1,6 @@
 # Deploy the TanStack Start landing page to GitHub Pages.
-# Builds with Bun, runs the SSR server locally via wrangler to capture
-# the real rendered HTML, then deploys via the standard GitHub Pages actions.
+# Builds with Bun, verifies the prerendered static HTML, then deploys via the
+# standard GitHub Pages actions.
 
 name: Deploy static content to Pages
 
@@ -46,92 +46,17 @@ jobs:
       - name: Build with base path
         run: bun run build -- --base=${{ env.BASE_PATH }}/
 
-      - name: Capture SSR-rendered HTML
+      - name: Verify static Pages artifact
         run: |
-          # Older build tooling generated dist/server/wrangler.json, but newer
-          # releases may omit it or use index.mjs/server.js instead of index.js. Create
-          # the local-only config explicitly from the actual build output.
-          if [ -f dist/server/index.mjs ]; then
-            SERVER_MAIN="index.mjs"
-          elif [ -f dist/server/index.js ]; then
-            SERVER_MAIN="index.js"
-          elif [ -f dist/server/server.mjs ]; then
-            SERVER_MAIN="server.mjs"
-          elif [ -f dist/server/server.js ]; then
-            SERVER_MAIN="server.js"
-          else
-            echo "ERROR: expected built SSR server entry at dist/server/index.mjs, dist/server/index.js, dist/server/server.mjs, or dist/server/server.js"
-            echo "Build output:"
-            find dist -maxdepth 3 -type f | sort | sed -n '1,120p'
+          if [ ! -f dist/client/index.html ]; then
+            echo "ERROR: dist/client/index.html was not prerendered"
+            echo "Client output:"
+            find dist/client -maxdepth 3 -type f | sort | sed -n '1,120p'
             exit 1
           fi
 
-          cat > dist/server/wrangler.json <<JSON
-          {
-            "\$schema": "../../node_modules/wrangler/config-schema.json",
-            "name": "tanstack-start-pages-capture",
-            "compatibility_date": "2025-09-24",
-            "compatibility_flags": ["nodejs_compat"],
-            "main": "$SERVER_MAIN",
-            "assets": {
-              "binding": "ASSETS",
-              "directory": "../client"
-            },
-            "no_bundle": true,
-            "rules": [
-              {
-                "type": "ESModule",
-                "globs": ["**/*.mjs", "**/*.js"]
-              }
-            ]
-          }
-          JSON
-
-          # Start the built Worker locally using miniflare (no auth needed).
-          ./node_modules/.bin/wrangler dev \
-            --config dist/server/wrangler.json \
-            --port 8788 --ip localhost --inspector-port 0 --local &
-          WRANGLER_PID=$!
-
-          CAPTURE_PATH="${BASE_PATH%/}/"
-          if [ "$CAPTURE_PATH" = "/" ]; then
-            CAPTURE_URL="http://localhost:8788/"
-          else
-            CAPTURE_URL="http://localhost:8788${CAPTURE_PATH}"
-          fi
-
-          # Wait for the server to be ready (up to 30s)
-          SERVER_READY=false
-          for i in $(seq 1 30); do
-            if curl -s -o /dev/null "$CAPTURE_URL" 2>/dev/null; then
-              SERVER_READY=true
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$SERVER_READY" = false ]; then
-            echo "ERROR: wrangler dev did not start within 30 seconds"
-            kill $WRANGLER_PID 2>/dev/null || true
-            exit 1
-          fi
-
-          # Capture the real SSR-rendered HTML (includes full head meta + pre-rendered React)
-          # -L is needed because wrangler returns a 307 redirect to the final URL
-          HTTP_STATUS=$(curl -sSL -w "%{http_code}" -o dist/client/index.html "$CAPTURE_URL")
-
-          # Stop the server
-          kill $WRANGLER_PID 2>/dev/null || true
-          wait $WRANGLER_PID 2>/dev/null || true
-
-          # Verify the output
           SIZE=$(wc -c < dist/client/index.html)
-          echo "Captured dist/client/index.html from $CAPTURE_URL ($SIZE bytes, HTTP $HTTP_STATUS)"
-          if [ "$HTTP_STATUS" -ge 400 ]; then
-            echo "ERROR: captured route returned HTTP $HTTP_STATUS"
-            head -20 dist/client/index.html
-            exit 1
-          fi
+          echo "Verified prerendered dist/client/index.html ($SIZE bytes)"
           if [ "$SIZE" -lt 100 ]; then
             echo "ERROR: captured HTML is too small ($SIZE bytes)"
             head -5 dist/client/index.html
