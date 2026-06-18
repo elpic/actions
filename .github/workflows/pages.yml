@@ -47,6 +47,7 @@ jobs:
         run: |
           rm -rf dist/pages
           ./node_modules/.bin/vite build \
+            --config vite.pages.config.ts \
             --base=${{ env.BASE_PATH }}/ \
             --outDir dist/pages \
             --emptyOutDir \
