@@ -93,10 +93,17 @@ jobs:
             --port 8788 --ip localhost --inspector-port 0 --local &
           WRANGLER_PID=$!
 
+          CAPTURE_PATH="${BASE_PATH%/}/"
+          if [ "$CAPTURE_PATH" = "/" ]; then
+            CAPTURE_URL="http://localhost:8788/"
+          else
+            CAPTURE_URL="http://localhost:8788${CAPTURE_PATH}"
+          fi
+
           # Wait for the server to be ready (up to 30s)
           SERVER_READY=false
           for i in $(seq 1 30); do
-            if curl -s -o /dev/null http://localhost:8788 2>/dev/null; then
+            if curl -s -o /dev/null "$CAPTURE_URL" 2>/dev/null; then
               SERVER_READY=true
               break
             fi
@@ -111,7 +118,7 @@ jobs:
 
           # Capture the real SSR-rendered HTML (includes full head meta + pre-rendered React)
           # -L is needed because wrangler returns a 307 redirect to the final URL
-          curl -sSL http://localhost:8788 > dist/client/index.html
+          HTTP_STATUS=$(curl -sSL -w "%{http_code}" -o dist/client/index.html "$CAPTURE_URL")
 
           # Stop the server
           kill $WRANGLER_PID 2>/dev/null || true
@@ -119,10 +126,25 @@ jobs:
 
           # Verify the output
           SIZE=$(wc -c < dist/client/index.html)
-          echo "Captured dist/client/index.html ($SIZE bytes)"
+          echo "Captured dist/client/index.html from $CAPTURE_URL ($SIZE bytes, HTTP $HTTP_STATUS)"
+          if [ "$HTTP_STATUS" -ge 400 ]; then
+            echo "ERROR: captured route returned HTTP $HTTP_STATUS"
+            head -20 dist/client/index.html
+            exit 1
+          fi
           if [ "$SIZE" -lt 100 ]; then
             echo "ERROR: captured HTML is too small ($SIZE bytes)"
             head -5 dist/client/index.html
+            exit 1
+          fi
+          if grep -q "This page didn't load\|Something went wrong on our end" dist/client/index.html; then
+            echo "ERROR: captured fallback error page instead of the landing page"
+            head -20 dist/client/index.html
+            exit 1
+          fi
+          if ! grep -q "Reusable GitHub Actions" dist/client/index.html; then
+            echo "ERROR: captured HTML does not contain the expected landing page content"
+            head -20 dist/client/index.html
             exit 1
           fi
           head -3 dist/client/index.html
