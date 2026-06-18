@@ -67,9 +67,15 @@
       },
       {
         "name": "build-output",
-        "description": "Directory containing the built output",
+        "description": "Directory containing the built output (relative to working-directory)",
         "required": false,
         "default": "dist"
+      },
+      {
+        "name": "working-directory",
+        "description": "Working directory relative to repo root (default: repo root)",
+        "required": false,
+        "default": "."
       }
     ]
   },
@@ -92,6 +98,18 @@
         "description": "Directory where the built artifact was extracted",
         "required": false,
         "default": "dist"
+      },
+      {
+        "name": "draft",
+        "description": "Create a draft release instead of publishing immediately",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "tag-name",
+        "description": "Tag to create a release for (default: inferred from github.ref). Useful for testing or creating releases for specific tags.",
+        "required": false,
+        "default": ""
       }
     ]
   },
@@ -145,7 +163,7 @@
       },
       {
         "name": "pypi-package-dir",
-        "description": "Directory containing built artifacts (relative to repo root)",
+        "description": "Directory containing built artifacts (relative to working-directory)",
         "required": false,
         "default": "dist"
       },
@@ -154,6 +172,12 @@
         "description": "mise task that builds the package wheel",
         "required": false,
         "default": "build"
+      },
+      {
+        "name": "working-directory",
+        "description": "Working directory relative to repo root (default: repo root)",
+        "required": false,
+        "default": "."
       }
     ]
   },
@@ -293,7 +317,7 @@
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
       }
@@ -451,7 +475,7 @@
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
       }
@@ -581,7 +605,7 @@
       },
       {
         "name": "env",
-        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example: DATABASE_URL=postgres://postgres:test@localhost:5432/test",
+        "description": "Environment variables to pass to the test process, one KEY=VALUE per line. Example:\n  DATABASE_URL=postgres://postgres:test@localhost:5432/test",
         "required": false,
         "default": ""
       }
@@ -689,17 +713,17 @@
     "category": "utilities",
     "subcategory": null,
     "name": "Mirror Docker Image",
-    "description": "Mirror a Docker image from a source registry (e.g. Docker Hub) to a mirror registry (default: GHCR), avoiding rate limits by reusing the mirrored copy on later runs.",
+    "description": "Mirror a Docker image from a source registry (e.g. Docker Hub) to a mirror registry (default: GHCR). On first use the image is pulled from the source and pushed to the mirror. On subsequent runs the image is pulled from the mirror and retagged under the original source name — so compose files and scripts can keep referencing the original tag without hitting rate limits.",
     "inputs": [
       {
         "name": "source",
-        "description": "Source image reference including tag (e.g. mockoon/cli:9.6.1, postgres:16). If no tag is provided, :latest is assumed.",
+        "description": "Source image reference including tag (e.g. mockoon/cli:9.6.1, postgres:16, quay.io/prometheus/node-exporter:v1.7.0). If no tag is provided, :latest is assumed.",
         "required": true,
         "default": null
       },
       {
         "name": "target",
-        "description": "Target image reference in the mirror registry. If not provided, one is auto-generated from the source and repository owner.",
+        "description": "Target image reference in the mirror registry. If not provided, one is auto-generated from the source and repository owner. Example: ghcr.io/myorg/mockoon-cli:9.6.1",
         "required": false,
         "default": ""
       },
@@ -711,7 +735,7 @@
       },
       {
         "name": "dockerhub_username",
-        "description": "Docker Hub username for authenticated pulls (optional). Authenticated pulls have a higher rate limit.",
+        "description": "Docker Hub username for authenticated pulls (optional). Authenticated pulls have a higher rate limit (200 pulls/6h vs 100/6h anonymous).",
         "required": false,
         "default": ""
       },
@@ -723,7 +747,7 @@
       },
       {
         "name": "force",
-        "description": "If true, always pull from the source and re-push to the mirror, even if the image already exists. Useful for mutable tags like :latest.",
+        "description": "If true, always pull from the source and re-push to the mirror, even if the image already exists in the mirror registry. Useful for mutable tags like :latest.",
         "required": false,
         "default": "false"
       }
@@ -794,7 +818,14 @@
     "subcategory": null,
     "name": "Setup Just",
     "description": "Install the just command runner (https://just.systems)",
-    "inputs": []
+    "inputs": [
+      {
+        "name": "version",
+        "description": "Version of just to install (e.g. v1.36.0). Defaults to latest.",
+        "required": false,
+        "default": "latest"
+      }
+    ]
   },
   {
     "slug": "utilities-setup-mise",
@@ -837,6 +868,12 @@
         "description": "Whether to also update the minor tag (e.g. v1.2)",
         "required": false,
         "default": "true"
+      },
+      {
+        "name": "dry-run",
+        "description": "If true, create floating tags locally but skip git push (useful for testing)",
+        "required": false,
+        "default": "false"
       }
     ]
   },
