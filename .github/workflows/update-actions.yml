@@ -1,0 +1,45 @@
+name: Update actions data
+
+# Keep src/data/actions.json in sync with the composite action.yml files in
+# this repo. Runs every 2 days, and can be triggered manually.
+on:
+  schedule:
+    - cron: "0 6 */2 * *" # 06:00 UTC every second day
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-actions-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Regenerate actions data
+        run: node scripts/generate-actions-data.mjs
+
+      - name: Commit changes if any
+        run: |
+          if [ -z "$(git status --porcelain src/data/actions.json)" ]; then
+            echo "No changes to actions data."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/actions.json
+          git commit -m "chore: update actions data [skip ci]"
+          git push
