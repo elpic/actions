@@ -70,9 +70,13 @@ runs:
         echo "✅ python/build: wheel created → $(basename "$WHEEL")"
 
         # Verify the wheel can be installed (use same python that'll import it)
-        python -m pip install "$WHEEL" --quiet
+        echo "  which python: $(which python)"
+        echo "  python version: $(python --version 2>&1)"
+        python -m pip install "$WHEEL" 2>&1
+        python -m pip list 2>&1 | grep -i test
         python -c "import test_package; v=test_package.__version__; assert v == '0.1.0', 'version mismatch: ' + v; print('✅ python/build: package installs and imports correctly')" || {
-          echo "FAIL: package failed to install or import"
+          rc=$?
+          echo "FAIL: package failed to install or import (exit code $rc)"
           exit 1
         }
 
