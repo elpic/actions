@@ -59,7 +59,7 @@ runs:
         echo "✅ python/build: wheel created → $(basename "$WHEEL")"
 
         # Verify the wheel is valid (check contents directly to avoid Python env mismatch)
-        unzip -l "$WHEEL" 2>&1 | head -20
+        unzip -l "$WHEEL" 2>&1 | tail -10
         if unzip -l "$WHEEL" 2>/dev/null | grep -q "test_package/__init__.py"; then
           echo "✅ python/build: wheel contains test_package module"
         else
