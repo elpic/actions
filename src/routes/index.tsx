@@ -99,8 +99,8 @@ const features = [
   },
   {
     icon: Shield,
-    title: "Security baked in",
-    body: "Lint, test, and security jobs ship as separate steps so you can compose the pipeline that fits your repo.",
+    title: "Tested on every change",
+    body: "Each action ships with its own test workflow that runs whenever its files change, so updates are verified before they reach a release.",
   },
   {
     icon: Zap,
@@ -173,7 +173,7 @@ export function Landing() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              v2.2.0 - released today
+              v2.4.0 - latest release
             </div>
             <h1 className="text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
               Reusable GitHub Actions,{" "}
