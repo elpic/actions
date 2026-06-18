@@ -68,7 +68,7 @@ jobs:
 
           cat > dist/server/wrangler.json <<JSON
           {
-            "$schema": "../../node_modules/wrangler/config-schema.json",
+            "\$schema": "../../node_modules/wrangler/config-schema.json",
             "name": "tanstack-start-pages-capture",
             "compatibility_date": "2025-09-24",
             "compatibility_flags": ["nodejs_compat"],
