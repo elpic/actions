@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import {
   GitBranch,
   Workflow,
@@ -45,6 +46,12 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+declare global {
+  interface Window {
+    __ELPIC_STATIC_PAGES__?: boolean;
+  }
+}
 
 const REPO = "https://github.com/elpic/actions";
 
@@ -102,7 +109,31 @@ const features = [
   },
 ];
 
-function Landing() {
+function ActionLink({
+  slug,
+  className,
+  children,
+}: {
+  slug: string;
+  className: string;
+  children: ReactNode;
+}) {
+  if (typeof window !== "undefined" && window.__ELPIC_STATIC_PAGES__) {
+    return (
+      <a href={`/actions/actions/${slug}`} className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link to="/actions/$slug" params={{ slug }} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+export function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
@@ -267,13 +298,12 @@ function Landing() {
                       : it.path.split("/").pop()!;
                     return (
                       <li key={it.slug}>
-                        <Link
-                          to="/actions/$slug"
-                          params={{ slug: it.slug }}
+                        <ActionLink
+                          slug={it.slug}
                           className="inline-block rounded-md border border-border bg-background/50 px-2.5 py-1 font-mono text-xs text-foreground/90 transition-colors hover:border-primary/50 hover:text-primary"
                         >
                           {label}
-                        </Link>
+                        </ActionLink>
                       </li>
                     );
                   })}
