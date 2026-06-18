@@ -43,31 +43,16 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build with base path
-        run: bun run build -- --base=${{ env.BASE_PATH }}/
-
-      - name: Create static Pages shell
+      - name: Build static Pages site
         run: |
-          ASSET_BASE="${BASE_PATH%/}/assets"
-          ENTRY_JS=$(grep -rl "hydrateRoot(document" dist/client/assets/*.js | head -n 1)
-          STYLES_CSS=$(find dist/client/assets -maxdepth 1 -name 'styles-*.css' | head -n 1)
+          rm -rf dist/pages
+          ./node_modules/.bin/vite build \
+            --base=${{ env.BASE_PATH }}/ \
+            --outDir dist/pages \
+            --emptyOutDir \
+            src/pages-entry.tsx
 
-          if [ -z "$ENTRY_JS" ] || [ ! -f "$ENTRY_JS" ]; then
-            echo "ERROR: could not find the client entry bundle"
-            find dist/client/assets -maxdepth 1 -type f | sort
-            exit 1
-          fi
-
-          if [ -z "$STYLES_CSS" ] || [ ! -f "$STYLES_CSS" ]; then
-            echo "ERROR: could not find the stylesheet bundle"
-            find dist/client/assets -maxdepth 1 -type f | sort
-            exit 1
-          fi
-
-          ENTRY_JS="${ASSET_BASE}/$(basename "$ENTRY_JS")"
-          STYLES_CSS="${ASSET_BASE}/$(basename "$STYLES_CSS")"
-
-          cat > dist/client/index.html <<HTML
+          cat > dist/pages/index.html <<HTML
           <!doctype html>
           <html lang="en">
             <head>
@@ -86,50 +71,51 @@ jobs:
               <meta name="twitter:title" content="elpic/actions - Reusable GitHub Actions" />
               <meta name="twitter:description" content="Composite GitHub Actions for integration, release, and delivery." />
               <link rel="canonical" href="https://elpic.github.io/actions/" />
-              <link rel="stylesheet" href="$STYLES_CSS" />
-              <script type="module" src="$ENTRY_JS"></script>
             </head>
-            <body></body>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="${BASE_PATH%/}/assets/pages-entry.js"></script>
+            </body>
           </html>
           HTML
 
       - name: Verify static Pages artifact
         run: |
-          if [ ! -f dist/client/index.html ]; then
-            echo "ERROR: dist/client/index.html was not generated"
+          if [ ! -f dist/pages/index.html ]; then
+            echo "ERROR: dist/pages/index.html was not generated"
             echo "Client output:"
-            find dist/client -maxdepth 3 -type f | sort | sed -n '1,120p'
+            find dist/pages -maxdepth 3 -type f | sort | sed -n '1,120p'
             exit 1
           fi
 
-          SIZE=$(wc -c < dist/client/index.html)
-          echo "Verified prerendered dist/client/index.html ($SIZE bytes)"
+          SIZE=$(wc -c < dist/pages/index.html)
+          echo "Verified generated dist/pages/index.html ($SIZE bytes)"
           if [ "$SIZE" -lt 100 ]; then
             echo "ERROR: captured HTML is too small ($SIZE bytes)"
-            head -5 dist/client/index.html
+            head -5 dist/pages/index.html
             exit 1
           fi
-          if grep -q "This page didn't load\|Something went wrong on our end" dist/client/index.html; then
+          if grep -q "This page didn't load\|Something went wrong on our end" dist/pages/index.html; then
             echo "ERROR: generated fallback error page instead of the landing page shell"
-            head -20 dist/client/index.html
+            head -20 dist/pages/index.html
             exit 1
           fi
-          if ! grep -q "elpic/actions - Reusable GitHub Actions" dist/client/index.html; then
+          if ! grep -q "elpic/actions - Reusable GitHub Actions" dist/pages/index.html; then
             echo "ERROR: generated HTML does not contain the expected page metadata"
-            head -20 dist/client/index.html
+            head -20 dist/pages/index.html
             exit 1
           fi
-          if ! grep -q 'type="module"' dist/client/index.html; then
+          if ! grep -q 'type="module"' dist/pages/index.html; then
             echo "ERROR: generated HTML does not load the client app bundle"
-            head -20 dist/client/index.html
+            head -20 dist/pages/index.html
             exit 1
           fi
-          head -3 dist/client/index.html
+          head -3 dist/pages/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist/client'
+          path: './dist/pages'
 
       - name: Deploy to GitHub Pages
         id: deployment
