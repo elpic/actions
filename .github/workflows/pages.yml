@@ -49,14 +49,18 @@ jobs:
       - name: Capture SSR-rendered HTML
         run: |
           # Older build tooling generated dist/server/wrangler.json, but newer
-          # releases may omit it or use index.mjs instead of index.js. Create
+          # releases may omit it or use index.mjs/server.js instead of index.js. Create
           # the local-only config explicitly from the actual build output.
           if [ -f dist/server/index.mjs ]; then
             SERVER_MAIN="index.mjs"
           elif [ -f dist/server/index.js ]; then
             SERVER_MAIN="index.js"
+          elif [ -f dist/server/server.mjs ]; then
+            SERVER_MAIN="server.mjs"
+          elif [ -f dist/server/server.js ]; then
+            SERVER_MAIN="server.js"
           else
-            echo "ERROR: expected built SSR server entry at dist/server/index.mjs or dist/server/index.js"
+            echo "ERROR: expected built SSR server entry at dist/server/index.mjs, dist/server/index.js, dist/server/server.mjs, or dist/server/server.js"
             echo "Build output:"
             find dist -maxdepth 3 -type f | sort | sed -n '1,120p'
             exit 1
