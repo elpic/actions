@@ -1,0 +1,62 @@
+name: Test GitHub Release Build
+description: Calls the actual delivery/github-release/build action with a minimal fixture.
+
+runs:
+  using: composite
+  steps:
+    - name: Create test fixture project
+      shell: bash
+      run: |
+        FIXTURE=".test-fixtures/github-release-build"
+        rm -rf "$FIXTURE"
+        mkdir -p "$FIXTURE"
+
+        # mise.toml — defines the build task the action will call
+        cat > "$FIXTURE/mise.toml" << 'EOF'
+        [tasks.build]
+        run = "bash build.sh"
+        EOF
+
+        # Build script that produces output matching build-output default (dist/)
+        cat > "$FIXTURE/build.sh" << 'SCRIPT'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        mkdir -p dist
+        echo "#!/usr/bin/env bash" > dist/test-app
+        echo 'echo "Hello from test-app v0.1.0"' >> dist/test-app
+        chmod +x dist/test-app
+        SCRIPT
+
+        echo "✅ Test fixture created at $FIXTURE"
+
+    # Call the actual github-release/build action
+    - uses: ./delivery/github-release/build
+      with:
+        app-name: test-app
+        working-directory: .test-fixtures/github-release-build
+
+    - name: Verify build output
+      shell: bash
+      run: |
+        OUTPUT_FILE=".test-fixtures/github-release-build/dist/test-app"
+        if [ ! -f "$OUTPUT_FILE" ]; then
+          echo "FAIL: build output not found at $OUTPUT_FILE"
+          ls -la .test-fixtures/github-release-build/dist/ 2>/dev/null || echo "  dist/ does not exist"
+          exit 1
+        fi
+
+        OUTPUT=$(bash "$OUTPUT_FILE")
+        if [ "$OUTPUT" != "Hello from test-app v0.1.0" ]; then
+          echo "FAIL: unexpected output: '$OUTPUT'"
+          exit 1
+        fi
+
+        echo "✅ github-release/build: build output created and verified"
+        echo "   Output: $OUTPUT"
+
+    - name: Cleanup fixture
+      if: always()
+      shell: bash
+      run: |
+        rm -rf .test-fixtures
+        echo "✅ Cleanup complete"

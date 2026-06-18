@@ -1,0 +1,75 @@
+name: Test Update Major Tag
+description: Validates the update-major-tag action end-to-end in dry-run mode.
+
+runs:
+  using: composite
+  steps:
+    # ── Setup: create test tags ────────────────────────────────────────
+    - name: Create test tag
+      shell: bash
+      run: |
+        git config user.email "test@test.com"
+        git config user.name "Test"
+        git tag v999999.0.0
+        echo "✅ Test tag v999999.0.0 created"
+
+    # ── Test 1: Default (update-minor: true) ──────────────────────────
+    - name: Test 1 — update-minor true creates both major and minor tags
+      uses: ./utilities/update-major-tag
+      with:
+        tag: v999999.0.0
+        update-minor: "true"
+        dry-run: "true"
+
+    - name: Verify Test 1
+      shell: bash
+      run: |
+        # v999999 should exist
+        MAJOR_HASH=$(git rev-parse v999999)
+        HEAD_HASH=$(git rev-parse HEAD)
+        [[ "$MAJOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999 points to $MAJOR_HASH, expected $HEAD_HASH"
+          exit 1
+        }
+        # v999999.0 should exist
+        MINOR_HASH=$(git rev-parse v999999.0)
+        [[ "$MINOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999.0 points to $MINOR_HASH, expected $HEAD_HASH"
+          exit 1
+        }
+        echo "✅ Test 1 passed: both v999999 and v999999.0 created"
+
+    # ── Test 2: update-minor: false ───────────────────────────────────
+    - name: Test 2 — update-minor false skips minor tag
+      uses: ./utilities/update-major-tag
+      with:
+        tag: v999999.1.0
+        update-minor: "false"
+        dry-run: "true"
+
+    - name: Verify Test 2
+      shell: bash
+      run: |
+        # v999999 should have moved to v999999.1.0's HEAD
+        # Create tag v999999.1.0 locally first
+        git tag v999999.1.0
+        HEAD_HASH=$(git rev-parse HEAD)
+        MAJOR_HASH=$(git rev-parse v999999)
+        [[ "$MAJOR_HASH" == "$HEAD_HASH" ]] || {
+          echo "FAIL: v999999 should have moved to latest commit"
+          exit 1
+        }
+        # v999999.1 should NOT have been created (update-minor=false)
+        if git rev-parse v999999.1 >/dev/null 2>&1; then
+          echo "FAIL: v999999.1 should not exist (update-minor=false)"
+          exit 1
+        fi
+        echo "✅ Test 2 passed: minor tag not created when update-minor=false"
+
+    # ── Cleanup ───────────────────────────────────────────────────────
+    - name: Cleanup test tags
+      if: always()
+      shell: bash
+      run: |
+        git tag -d v999999 v999999.0 v999999.0.0 v999999.1 v999999.1.0 2>/dev/null || true
+        echo "✅ Cleanup complete"

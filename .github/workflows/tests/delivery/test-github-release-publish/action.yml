@@ -1,0 +1,78 @@
+name: Test GitHub Release Publish
+description: Calls the actual delivery/github-release/publish action with a draft release.
+
+runs:
+  using: composite
+  steps:
+    # ── Setup: create a unique test tag ────────────────────────────────
+    - name: Create test tag
+      shell: bash
+      run: |
+        TAG="test-publish-$(date +%s)"
+        git config user.email "test@test.com"
+        git config user.name "Test"
+        git tag "$TAG"
+        git push origin "$TAG"
+        echo "TAG=$TAG" >> "$GITHUB_ENV"
+        echo "✅ Test tag $TAG created and pushed"
+
+    # ── Create and upload a test artifact ──────────────────────────────
+    - name: Create test artifact
+      shell: bash
+      run: |
+        mkdir -p dist
+        echo "#!/usr/bin/env bash" > dist/test-app
+        echo 'echo "Hello from test-app v0.1.0"' >> dist/test-app
+        chmod +x dist/test-app
+        sha256sum dist/test-app > dist/test-app.sha256
+        echo "✅ Test artifact created"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: test-publish-app-dist
+        path: dist/
+
+    # ── Call the actual publish action ─────────────────────────────────
+    - uses: ./delivery/github-release/publish
+      with:
+        app-name: test-publish-app
+        tag-name: ${{ env.TAG }}
+        draft: "true"
+
+    # ── Verify the draft release was created ───────────────────────────
+    - name: Verify draft release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        TAG="${{ env.TAG }}"
+        RELEASE_INFO=$(gh release view "$TAG" --json name,tagName,isDraft 2>&1) || {
+          echo "FAIL: could not find release for tag $TAG"
+          echo "Output: $RELEASE_INFO"
+          exit 1
+        }
+        echo "Release info: $RELEASE_INFO"
+        echo "$RELEASE_INFO" | grep -qE '"isDraft": ?true' && {
+          echo "✅ github-release/publish: draft release created successfully"
+        } || {
+          echo "FAIL: release was not created as draft"
+          exit 1
+        }
+
+    # ── Cleanup: delete the test tag and draft release ─────────────────
+    - name: Cleanup
+      if: always()
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        TAG="${{ env.TAG }}"
+        if [ -n "$TAG" ]; then
+          echo "Cleaning up $TAG ..."
+          gh release delete "$TAG" --yes 2>/dev/null || echo "  (no release to delete)"
+          git push origin ":refs/tags/${TAG}" 2>/dev/null || echo "  (no tag to delete)"
+          git tag -d "$TAG" 2>/dev/null || true
+          echo "✅ Cleanup complete"
+        else
+          echo "No tag to clean up"
+        fi

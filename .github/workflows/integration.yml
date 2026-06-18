@@ -6,10 +6,6 @@ name: Integration
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'utilities/**'
-      - 'delivery/**'
-      - '.github/workflows/**'
   push:
     branches: [main]
     paths:
@@ -91,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      contents: read
+      contents: write
       packages: write
       issues: write
       pull-requests: write
@@ -115,6 +111,14 @@ jobs:
               - 'utilities/docker-mirror/**'
             upsert_pr_comment:
               - 'utilities/upsert-pr-comment/**'
+            update_major_tag:
+              - 'utilities/update-major-tag/**'
+            python_build:
+              - 'delivery/python/build/**'
+            github_release_build:
+              - 'delivery/github-release/build/**'
+            github_release_publish:
+              - 'delivery/github-release/publish/**'
 
       # ── Generate OCI Tags ──────────────────────────────────────────
       - id: test_generate_oci_tags
@@ -146,6 +150,30 @@ jobs:
         continue-on-error: true
         uses: ./.github/workflows/tests/utilities/test-upsert-pr-comment
 
+      # ── Update Major Tag ──────────────────────────────────────────
+      - id: test_update_major_tag
+        if: steps.filter.outputs.update_major_tag == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/utilities/test-update-major-tag
+
+      # ── Python Build ──────────────────────────────────────────────
+      - id: test_python_build
+        if: steps.filter.outputs.python_build == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/delivery/test-python-build
+
+      # ── GitHub Release Build ──────────────────────────────────────
+      - id: test_github_release_build
+        if: steps.filter.outputs.github_release_build == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/delivery/test-github-release-build
+
+      # ── GitHub Release Publish ────────────────────────────────────
+      - id: test_github_release_publish
+        if: steps.filter.outputs.github_release_publish == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/delivery/test-github-release-publish
+
       # ── Report results ─────────────────────────────────────────────
       - name: Report results
         if: always()
@@ -168,6 +196,11 @@ jobs:
           inspect "Setup Just"         "${{ steps.test_setup_just.outcome }}"
           inspect "Setup Mise"         "${{ steps.test_setup_mise.outcome }}"
           inspect "Mirror Docker Image" "${{ steps.test_docker_mirror.outcome }}"
+
+          inspect "Update Major Tag"   "${{ steps.test_update_major_tag.outcome }}"
+          inspect "Python Build"       "${{ steps.test_python_build.outcome }}"
+          inspect "GitHub Release Build" "${{ steps.test_github_release_build.outcome }}"
+          inspect "GitHub Release Publish" "${{ steps.test_github_release_publish.outcome }}"
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             inspect "Upsert PR Comment" "${{ steps.test_upsert_pr_comment.outcome }}"

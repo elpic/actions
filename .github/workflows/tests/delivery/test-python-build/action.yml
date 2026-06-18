@@ -1,0 +1,81 @@
+name: Test Python Build
+description: Calls the actual delivery/python/build action with a minimal fixture project.
+
+runs:
+  using: composite
+  steps:
+    - name: Create test fixture project
+      shell: bash
+      run: |
+        FIXTURE=".test-fixtures/python-build"
+        rm -rf "$FIXTURE"
+        mkdir -p "$FIXTURE/test_package"
+
+        # mise.toml — defines the build task the action will call
+        cat > "$FIXTURE/mise.toml" << 'EOF'
+        [tasks.build]
+        run = "python -m build"
+        EOF
+
+        # pyproject.toml — flat layout, no setup.cfg needed
+        cat > "$FIXTURE/pyproject.toml" << 'EOF'
+        [build-system]
+        requires = ["setuptools>=68.0", "wheel"]
+        build-backend = "setuptools.build_meta"
+
+        [project]
+        name = "test-package"
+        version = "0.1.0"
+        description = "A test package for CI validation"
+        requires-python = ">=3.9"
+        EOF
+
+        cat > "$FIXTURE/test_package/__init__.py" << 'EOF'
+        __version__ = "0.1.0"
+        EOF
+
+        echo "✅ Test fixture created at $FIXTURE"
+
+    # Ensure the build package is available for the action's mise task
+    - name: Install build package
+      shell: bash
+      run: pip install build
+
+    # Call the actual python/build action with working-directory pointing to our fixture
+    - uses: ./delivery/python/build
+      with:
+        app-name: test-package
+        working-directory: .test-fixtures/python-build
+
+    - name: Verify build output
+      shell: bash
+      run: |
+        WHEEL=$(ls .test-fixtures/python-build/dist/*.whl 2>/dev/null | head -1)
+        if [ -z "$WHEEL" ]; then
+          echo "FAIL: no .whl file found in .test-fixtures/python-build/dist/"
+          ls -la .test-fixtures/python-build/dist/ 2>/dev/null || echo "  dist/ does not exist"
+          exit 1
+        fi
+        echo "✅ python/build: wheel created → $(basename "$WHEEL")"
+
+        # Verify the wheel is valid (check contents directly to avoid Python env mismatch)
+        unzip -l "$WHEEL" 2>&1 | tail -10
+        if unzip -l "$WHEEL" 2>/dev/null | grep -q "test_package/__init__.py"; then
+          echo "✅ python/build: wheel contains test_package module"
+        else
+          echo "FAIL: wheel does not contain test_package module"
+          exit 1
+        fi
+        if unzip -l "$WHEEL" 2>/dev/null | grep -q "test_package-.*\.dist-info/METADATA"; then
+          echo "✅ python/build: wheel has valid metadata"
+        else
+          echo "FAIL: wheel missing dist-info METADATA"
+          exit 1
+        fi
+
+    - name: Cleanup fixture
+      if: always()
+      shell: bash
+      run: |
+        rm -rf .test-fixtures
+        echo "✅ Cleanup complete"
