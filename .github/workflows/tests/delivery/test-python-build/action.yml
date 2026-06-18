@@ -9,7 +9,7 @@ runs:
       run: |
         FIXTURE=".test-fixtures/python-build"
         rm -rf "$FIXTURE"
-        mkdir -p "$FIXTURE/src/test_package"
+        mkdir -p "$FIXTURE/test_package"
 
         # mise.toml — defines the build task the action will call
         cat > "$FIXTURE/mise.toml" << 'EOF'
@@ -17,7 +17,7 @@ runs:
         run = "python -m build"
         EOF
 
-        # pyproject.toml
+        # pyproject.toml — flat layout, no setup.cfg needed
         cat > "$FIXTURE/pyproject.toml" << 'EOF'
         [build-system]
         requires = ["setuptools>=68.0", "wheel"]
@@ -30,19 +30,8 @@ runs:
         requires-python = ">=3.9"
         EOF
 
-        cat > "$FIXTURE/src/test_package/__init__.py" << 'EOF'
+        cat > "$FIXTURE/test_package/__init__.py" << 'EOF'
         __version__ = "0.1.0"
-        EOF
-
-        cat > "$FIXTURE/setup.cfg" << 'EOF'
-        [metadata]
-        name = test-package
-        version = 0.1.0
-
-        [options]
-        package_dir =
-            = src
-        packages = find:
         EOF
 
         echo "✅ Test fixture created at $FIXTURE"
