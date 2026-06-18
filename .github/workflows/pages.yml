@@ -50,8 +50,7 @@ jobs:
             --config vite.pages.config.ts \
             --base=${{ env.BASE_PATH }}/ \
             --outDir dist/pages \
-            --emptyOutDir \
-            pages.html
+            --emptyOutDir
           mv dist/pages/pages.html dist/pages/index.html
 
       - name: Verify static Pages artifact
