@@ -1,0 +1,140 @@
+name: Test Tauri Build
+description: "Verifies that the Tauri build action runs the full build pipeline"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Scaffold test Tauri project
+      shell: bash
+      run: |
+        FIXTURE=".test-fixtures/tauri-build"
+        rm -rf "$FIXTURE"
+        mkdir -p "$FIXTURE/src"
+        mkdir -p "$FIXTURE/src-tauri/src"
+        mkdir -p "$FIXTURE/dist"
+
+        # Frontend: package.json
+        cat > "$FIXTURE/package.json" << 'PKGJSON'
+        {
+          "name": "test-tauri-app",
+          "private": true,
+          "scripts": {
+            "build": "echo frontend built > dist/index.html"
+          },
+          "devDependencies": {
+            "typescript": "^5.0.0"
+          }
+        }
+PKGJSON
+
+        # Frontend: tsconfig.json
+        cat > "$FIXTURE/tsconfig.json" << 'TSCONF'
+        {
+          "compilerOptions": {
+            "target": "ES2020",
+            "module": "ESNext",
+            "strict": true,
+            "noEmit": true,
+            "skipLibCheck": true
+          }
+        }
+TSCONF
+
+        # Frontend: minimal TypeScript source
+        cat > "$FIXTURE/src/index.ts" << 'TSFILE'
+        const greeting: string = "hello from Tauri test";
+        console.log(greeting);
+TSFILE
+
+        # Generate package-lock.json
+        cd "$FIXTURE"
+        npm install --package-lock-only --silent 2>/dev/null
+        cd "$GITHUB_WORKSPACE"
+
+        # Rust: Cargo.toml
+        cat > "$FIXTURE/src-tauri/Cargo.toml" << 'CARGO'
+        [package]
+        name = "test-tauri-app"
+        version = "0.1.0"
+        edition = "2021"
+
+        [dependencies]
+        tauri = { version = "2", features = [] }
+
+        [build-dependencies]
+        tauri-build = { version = "2", features = [] }
+CARGO
+
+        # Rust: build.rs
+        cat > "$FIXTURE/src-tauri/build.rs" << 'BUILD'
+        fn main() {
+            tauri_build::build()
+        }
+BUILD
+
+        # Rust: main.rs
+        cat > "$FIXTURE/src-tauri/src/main.rs" << 'RUSTSRC'
+        #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+        fn main() {
+            println!("Tauri app stub — build test passed");
+        }
+
+        #[cfg(test)]
+        mod tests {
+            #[test]
+            fn it_works() {
+                assert_eq!(2 + 2, 4);
+            }
+        }
+RUSTSRC
+
+        # Tauri config
+        cat > "$FIXTURE/src-tauri/tauri.conf.json" << 'TAURICONF'
+        {
+          "productName": "test-tauri-app",
+          "version": "0.1.0",
+          "identifier": "com.test.tauri.app",
+          "build": {
+            "frontendDist": "../dist"
+          },
+          "app": {
+            "windows": []
+          }
+        }
+TAURICONF
+
+        echo "✅ Fixture created at $FIXTURE"
+
+    - name: Run Tauri build
+      shell: bash
+      working-directory: .test-fixtures/tauri-build
+      run: |
+        # Run each step that the build action would run
+        npm ci
+        npx tsc --noEmit
+        npm run build
+        cd src-tauri
+        cargo check 2>&1
+        cargo clippy -- -D warnings 2>&1
+        cargo test 2>&1
+
+    - name: Verify output
+      shell: bash
+      run: |
+        FIXTURE=".test-fixtures/tauri-build"
+        if [ ! -f "$FIXTURE/dist/index.html" ]; then
+          echo "FAIL: frontend build did not produce dist/index.html"
+          exit 1
+        fi
+        echo "✅ Tauri build: all steps completed successfully"

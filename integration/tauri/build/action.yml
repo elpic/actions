@@ -1,0 +1,32 @@
+name: "Build Tauri app"
+description: "Runs frontend build, cargo check, clippy, and cargo test"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Type check
+      shell: bash
+      run: npx tsc --noEmit
+
+    - name: Build frontend
+      shell: bash
+      run: npm run build
+
+    - name: Cargo check
+      shell: bash
+      working-directory: src-tauri
+      run: cargo check
+
+    - name: Cargo clippy
+      shell: bash
+      working-directory: src-tauri
+      run: cargo clippy -- -D warnings
+
+    - name: Cargo test
+      shell: bash
+      working-directory: src-tauri
+      run: cargo test
