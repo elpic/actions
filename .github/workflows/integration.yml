@@ -11,6 +11,7 @@ on:
     paths:
       - 'utilities/**'
       - 'delivery/**'
+      - 'integration/**'
       - '.github/workflows/**'
 
 concurrency:
@@ -119,6 +120,10 @@ jobs:
               - 'delivery/github-release/build/**'
             github_release_publish:
               - 'delivery/github-release/publish/**'
+            tauri_setup:
+              - 'integration/tauri/setup/**'
+            tauri_build:
+              - 'integration/tauri/build/**'
 
       # ── Generate OCI Tags ──────────────────────────────────────────
       - id: test_generate_oci_tags
@@ -174,6 +179,18 @@ jobs:
         continue-on-error: true
         uses: ./.github/workflows/tests/delivery/test-github-release-publish
 
+      # ── Tauri Setup ────────────────────────────────────────────────
+      - id: test_tauri_setup
+        if: steps.filter.outputs.tauri_setup == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/integration/test-tauri-setup
+
+      # ── Tauri Build ────────────────────────────────────────────────
+      - id: test_tauri_build
+        if: steps.filter.outputs.tauri_build == 'true'
+        continue-on-error: true
+        uses: ./.github/workflows/tests/integration/test-tauri-build
+
       # ── Report results ─────────────────────────────────────────────
       - name: Report results
         if: always()
@@ -201,6 +218,9 @@ jobs:
           inspect "Python Build"       "${{ steps.test_python_build.outcome }}"
           inspect "GitHub Release Build" "${{ steps.test_github_release_build.outcome }}"
           inspect "GitHub Release Publish" "${{ steps.test_github_release_publish.outcome }}"
+
+          inspect "Tauri Setup" "${{ steps.test_tauri_setup.outcome }}"
+          inspect "Tauri Build" "${{ steps.test_tauri_build.outcome }}"
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             inspect "Upsert PR Comment" "${{ steps.test_upsert_pr_comment.outcome }}"
