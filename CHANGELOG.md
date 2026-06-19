@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/elpic/actions/compare/v2.4.0...v2.5.0) (2026-06-19)
+
+
+### Features
+
+* add Tauri composite actions (setup + build) and integration tests ([9285570](https://github.com/elpic/actions/commit/9285570b1b58976b2a3fd6188648c1988e0266df))
+
 ## [2.4.0](https://github.com/elpic/actions/compare/v2.3.0...v2.4.0) (2026-06-16)
 
 
